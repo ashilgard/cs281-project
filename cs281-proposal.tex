@@ -5,6 +5,7 @@
 
 \documentclass[a4paper, 11pt]{article}
 \usepackage{float}
+\usepackage{natbib}
 \usepackage{graphicx}%
 \DeclareGraphicsExtensions{.pdf,.eps,.png}
 \begin{document}
@@ -12,18 +13,30 @@
 
 
 \section{Problem Statement}
+%This should clearly state what problem you are trying to solve. If you have developed a new model, explain what models this work will build on and how it resolves deficiencies. If it is a new algorithm for inference, explain the regimes for which you think it will be well-suited. If you are developing a new theoretical contribution, discuss the theorems you will prove. For problem-driven papers, discuss the data and the unique challenges that make this interesting.
 \subsection{Peer Prediction} 
 \paragraph{}The general problem of peer prediction concerns creating mechanisms to incentivize honest forecasts and feedback from crowd workers. The main line along which peer prediction tasks are split is ``ground truth" vs. ``no ground truth". In scenarios with ground truth, there are methods such as ``gold standard reports" which may often be used to conclusively determine effort and quality of reports, but these may be too costly to generate. In scenarios with no ground truth, we often have no better option than to use manipulations on the reports themselves to determine the quality of the other reports. 
 \paragraph{}However, the no ground truth problem inherently prohibits many peer prediction mechanisms, as diversity of opinions will be interpreted as incorrectness. For example, if we were to judge the quality of Google reviews by whether the reports agreed with other Google reviews, truthful minority opinions would be penalized. This leads us to believe that a more complicated heterogeneous-user mechanism is required.
-\subsection{Global Forecasting} 
-\paragraph{}
+\subsection{Forecasting} 
+\paragraph{} Peer prediction can also be used to provide intermediate feedback in forecasting tasks where there is a true answer that will eventually be realized but is not yet available. This potentially incentivizes workers to invest more effort and allows them to hone their skills. \citet{witkowski2017proper} show that proxies can often be generated that closely track the performance of the eventual result. (It remains to be seen whether providing this feedback concurrently with ongoing predictions would affect those predictions, but this is a possible question for our research to explore through simulations such as those in \citet{shnayder2016measuring}.) We hope to find whether machine learning algorithms can correctly identify ``types" of people, based perhaps on measures of general or topic-specific expertise as well as psychological markers and use these types to generate feedback that would lead to improved accuracy and while not penalizing diversity of opinions. 
+\subsection{Data}
+We will primarily be using data from the Good Judgment Project, available online at  \texttt{https://dataverse.harvard.edu/dataverse.xhtml?alias=gjp}. We hope to then be able to extrapolate results to a new iteration of this forecasting competition, available at \texttt{http://gjopen.com}, from which data is being scraped. Unique challenges in this problem include the difficulty of quantifying the underlying variable, identifying the proper grouping mechanism such that people are suitably similar to their peers without encountering extreme sparsity of data, and creating a mechanism that would encourage higher accuracy but not promote herding behavior in an online setting.
 
 \section{Approach}
+%Tell us about the code that you will be writing or the theorems that you will be proving. Non-theory CS281 projects should have a significant implementation component in which you will be coding up your own inference algorithms; describe what these algorithms will be. (For example, ?I will implement a collapsed Gibbs sampler for...?)
 
 \section{Evaluation}
+% Identify relevant work and algorithms you intend to implement as baselines. (Note: it is okay for a project to fail to beat the baselines, but you must be able to explain why.)
 
 \section{Collaboration Plan}
+%If you?re working in a team, include who you?ll be working with and how you intend to split up the work.
 
 \section{Double Dipping}
+%You may use work that you are completing as part of another final project or your research for your CS281 final project, as long as (a) your proposed work meets the technical requirements for a CS281 project (that is, significant implementation of your own algorithms) and (b) you have discussed double-dipping with your other course instructor/advisor and have their approval. You must explicitly state ?I have discussed combining my CS281 final project and my [research/course number of other project] with [name of instructor/advisor] and have his/her approval.?
+Brian, Casey: N/A. \\
+Sophie: I have discussed combining my CS281 final project and my research with David Parkes and have his approval.
+
+\bibliography{bibliography}
+\bibliographystyle{plainnat}
 
 \end{document}
