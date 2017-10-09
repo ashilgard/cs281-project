@@ -6,6 +6,7 @@
 \documentclass[a4paper, 11pt]{article}
 \usepackage{float}
 \usepackage{natbib}
+\usepackage{fullpage}
 \usepackage{graphicx}%
 \DeclareGraphicsExtensions{.pdf,.eps,.png}
 \begin{document}
@@ -20,7 +21,7 @@
 \subsection{Forecasting} 
 \paragraph{} Peer prediction can also be used to provide intermediate feedback in forecasting tasks where there is a true answer that will eventually be realized but is not yet available. This potentially incentivizes workers to invest more effort and allows them to hone their skills. \citet{witkowski2017proper} show that proxies can often be generated that closely track the performance of the eventual result. (It remains to be seen whether providing this feedback concurrently with ongoing predictions would affect those predictions, but this is a possible question for our research to explore through simulations such as those in \citet{shnayder2016measuring}.) We hope to find whether machine learning algorithms can correctly identify ``types" of people, based perhaps on measures of general or topic-specific expertise as well as psychological markers and use these types to generate feedback that would lead to improved accuracy and while not penalizing diversity of opinions. 
 \subsection{Data}
-We will primarily be using data from the Good Judgment Project, available online at  \texttt{https://dataverse.harvard.edu/dataverse.xhtml?alias=gjp}. We hope to then be able to extrapolate results to a new iteration of this forecasting competition, available at \texttt{http://gjopen.com}, from which data is being scraped. Unique challenges in this problem include the difficulty of quantifying the underlying variable, identifying the proper grouping mechanism such that people are suitably similar to their peers without encountering extreme sparsity of data, and creating a mechanism that would encourage higher accuracy but not promote herding behavior in an online setting.
+We will primarily be using data from the Good Judgment Project, available online at  \\ \texttt{https://dataverse.harvard.edu/dataverse.xhtml?alias=gjp}. We hope to then be able to extrapolate results to a new iteration of this forecasting competition, available at \texttt{http://gjopen.com}, from which data is being scraped. Unique challenges in this problem include the difficulty of quantifying the underlying variable, identifying the proper grouping mechanism such that people are suitably similar to their peers without encountering extreme sparsity of data, and creating a mechanism that would encourage higher accuracy but not promote herding behavior in an online setting.
 
 \section{Approach}
 %Tell us about the code that you will be writing or the theorems that you will be proving. Non-theory CS281 projects should have a significant implementation component in which you will be coding up your own inference algorithms; describe what these algorithms will be. (For example, ?I will implement a collapsed Gibbs sampler for...?)
