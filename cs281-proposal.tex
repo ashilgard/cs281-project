@@ -25,7 +25,7 @@ We will primarily be using data from the Good Judgment Project, available online
 
 \section{Approach}
 %Tell us about the code that you will be writing or the theorems that you will be proving. Non-theory CS281 projects should have a significant implementation component in which you will be coding up your own inference algorithms; describe what these algorithms will be. (For example, ?I will implement a collapsed Gibbs sampler for...?)
-There are a number of recommendation system algorithms that seem extendable to our task of predicting user types, in particular collaborative filtering and matrix factorization.
+There are a number of recommendation system algorithms that seem extendable to our task of predicting user types, in particular collaborative filtering and matrix factorization. Once we have determined appropriate types or clusters to test for users, we will seek to either find an existing peer prediction mechanism or develop a new peer prediction mechanism that provides feedback which is an accurate proxy for the final realization. Additionally, we will seek to run simulations that show the potential degree of herding behavior encouraged (either within or across classes) by specific peer prediction mechanisms. We will also attempt to project our clustering mechanism onto new data from the currently occurring Global Forecasting Competition and show whether the learned parameters can extrapolate to new data.
 
 \section{Evaluation}
 % Identify relevant work and algorithms you intend to implement as baselines. (Note: it is okay for a project to fail to beat the baselines, but you must be able to explain why.)
@@ -33,9 +33,9 @@ Other peer prediction mechanisms that have been used in similar scenarios and co
 
 \section{Collaboration Plan}
 %If you?re working in a team, include who you?ll be working with and how you intend to split up the work.
-Brian Hentschel: \\
-Sophie Hilgard: \\
-Casey Meehan:
+Brian Hentschel: Implementation of collaborative filtering and matrix factorization processes for clustering.\\
+Sophie Hilgard: Development of theoretical peer prediction mechanism properties and simulation tasks.\\
+Casey Meehan: Implementation of peer prediction mechanism simulations in repeated environments. Develop tests for code.
 
 \section{Double Dipping}
 %You may use work that you are completing as part of another final project or your research for your CS281 final project, as long as (a) your proposed work meets the technical requirements for a CS281 project (that is, significant implementation of your own algorithms) and (b) you have discussed double-dipping with your other course instructor/advisor and have their approval. You must explicitly state ?I have discussed combining my CS281 final project and my [research/course number of other project] with [name of instructor/advisor] and have his/her approval.?
