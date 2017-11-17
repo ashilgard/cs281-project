@@ -1,0 +1,59 @@
+\title{Project Update: CS281, Fall 2017}
+\author{Brian Hentschel, Anna Sophie Hilgard, Casey Meehan}
+
+\date{\today}
+
+\documentclass[a4paper, 11pt]{article}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage{fullpage}
+\usepackage{graphicx}%
+\DeclareGraphicsExtensions{.pdf,.eps,.png}
+\begin{document}
+\maketitle
+
+
+\section{Abstract}
+% (a) contain a paragraph that is a draft of the abstract for the final paper 
+% 
+Classical peer prediction mechanisms for both ground-truth and no ground-truth cases often assume that users are homogeneous - that is, that their signals are drawn from identical distributions. However, in many no ground-truth environments this model is a poor fit for the true nature of the data. A simple motivating example is that of scoring user reviews (of restaurants, movies, etc.) with peer prediction. Truthful opinions can be expected to vary based on individual characteristics, and we prefer not to penalize users for reporting honestly simply because their opinions are less prevalent than others'.
+
+Recent work by \citet{agarwal2017peer} showed that mechanisms exist which are informed-truthful within an error bound when clustering users based on similarity of signal confusion matrices. However, the clustering mechanisms described in this paper are chosen for to define a provable bound rather than optimize for empirical performance. We will instead test a variety of clustering mechanisms, potentially both model-based and model free, and attempt to achieve a grouping which is empirically more likely to encourage truthful feedback than this baseline.
+
+Additionally, many of the datasets used in the empirical work section of this paper actually have a ground truth or gold label, allowing for the use of the Dawid-Skene latent type methods \citep{dawid1979maximum}. The primary dataset we will focus on, that of the Good Judgment Project Global Forecasting Competition, does not have these labels available, requiring the use of clustering schemes more amenable to missing data. However, it would be an interesting extension to see how error bounds increase when using a proper proxy \citep{witkowski2017proper} as a psuedo-label or whether it is possible to back out individual signal confusion matrices from our estimated correlation matrices using tensor decomposition methods. With these signal confusion matrices, it may be possible to estimate the preserved signal information for any given individual after removing personal  reporting biases, which would potentially allow for a novel information gain-based reward scheme in these settings.
+
+\section{Background}
+In the Good Judgment Project Global Forecasting Competition, the crowdsourced workers are asked to predict the probability of the occurrence of global political events. It has been shown by \citet{ungar2012good} that this task is surprisingly trainable. That is, with proper feedback and instructions, participants can greatly improve their predictions over time, leading to accurate (by Brier Score) approximations when strategically aggregated over the population. Additionally, work by the Good Judgment Project team has shown that frequent updates are one of the best predictors of prediction accuracy. However, due to the nature of the task, natural feedback is not often available. Tasks frequently ask about the probability of an event within a timeframe of several months. Then, particularly in a negative realization of the event, and often for a positive realization, the answer is not available for some time. \citet{witkowski2017proper} have shown that it is in general possible to create a useful proxy for the final realization of the event from an aggregation of current predictions, leading us to believe that we should be able to provide some useful intermediate feedback through peer prediction, leading to increased worker engagement and encouraging worker effort. However, in this environment, differences in reports can come both from asymmetric information and heterogeneous reporting policies. It is critical that we control for heterogeneous reporting to avoid penalizing workers who may have an uncommon but truthful piece of information concerning the outcome. If we assume that the signals themselves are drawn from the same distribution (or distributions based on other potentially observable or inferable features such as expertise), we should be able to achieve truthfulness after controlling for heterogeneity of signal reporting. 
+
+% (b) reflect any changes you have to your approach since your proposal, 
+% 
+\section{Changes Since Proposal}
+We have not made any material changes since our initial project proposal.
+% (c) include results for at least some baselines or, for more theoretical projects, any proof attempts so far.
+
+\subsection{Baselines and Approaches}
+We intend to first test our methods on datasets with simpler, more interpretable signals like those used to develop the empirical portion of \citet{agarwal2017peer}. The Adult Dataset (\texttt{https://github.com/ipeirotis/Get-Another-Label}) and HCB Dataset \\ (\texttt{http://ir.ischool.utexas.edu/square/data.html}) both have relatively high upper bounds on the truthfulness for low numbers of clusters and exhibit some degree of personal judgment in their tasks, identifying the sexual content rating of websites and assessing relevance of web results, respectively. These characteristics suggest that these may be more interesting targets for studies of heterogeneity in users than, for example, labeling dog breeds.
+
+We will then move on to testing methods on the Good Judgment Data, available at \\
+\texttt{https://dataverse.harvard.edu/dataverse.xhtml?alias=gjp}. We hope to additionally be able to extrapolate results to a new iteration of this forecasting competition, available at \texttt{http://gjopen.com}, from which data is being scraped. Unique challenges in this problem include the difficulty of quantifying the underlying variable and identifying workable grouping techniques for users with sparse data.
+
+The initial steps of our project have involved preprocessing this data into the delta matrices described in \citet{agarwal2017peer}, on which we hope to be able to cluster the users. We also must develop the regret calculation framework to evaluate the truthfulness measure for each peer prediction mechanism on which we hope to test, beginning with Correlated Agreement. The baselines against which we hope to improve are those given in the final section of the paper, stating the upper bound on truthfulness incentive bound using clustering based on tensor decomposition methods (which require the existence of per-user confusion matrices).
+
+We will also code up the algorithm used in the paper to initially describe the upper-bounded clustering algorithm and then move on to exploring machine-learning based clustering algorithms, likely beginning with those in the clustering chapter of Murphy to see what is most applicable to our problem and how we might be able to adaptively learn clusters that correspond to our unique goal of motivating truthfulness. In particular, in many non-laboratory signal distributions, the signals may not be evenly distributed, and so it seems likely that it will be the case that a machine learning approach could learn on which segments of the matrix it is most critical to focus on matching with highest precision so as to lower the regret in expectation over all signals. Initial thoughts on the formulation of the problem suggest that it may be useful to formulate each user's data as a concatenation of all of its correlation matrices with other users. In part
+
+%, and creating a mechanism that would encourage higher accuracy but not promote herding behavior in an online setting.
+
+
+%\section{Approach}
+%Tell us about the code that you will be writing or the theorems that you will be proving. Non-theory CS281 projects should have a significant implementation component in which you will be coding up your own inference algorithms; describe what these algorithms will be. (For example, ?I will implement a collapsed Gibbs sampler for...?)
+%There are a number of recommendation system algorithms that seem extendable to our task of predicting user types, in particular collaborative filtering and matrix factorization. Once we have determined appropriate types or clusters to test for users, we will seek to either find an existing peer prediction mechanism or develop a new peer prediction mechanism that provides feedback which is an accurate proxy for the final realization. Additionally, we will seek to run simulations that show the potential degree of herding behavior encouraged (either within or across classes) by specific peer prediction mechanisms. We will also attempt to project our clustering mechanism onto new data from the currently occurring Global Forecasting Competition and show whether the learned parameters can extrapolate to new data.
+
+\section{Evaluation}
+% Identify relevant work and algorithms you intend to implement as baselines. (Note: it is okay for a project to fail to beat the baselines, but you must be able to explain why.)
+We intend to evaluate the clustering algorithms on the expected regret a user experiences by telling the truth under a given peer prediction scheme. That is, the expected gain in feedback reward a user could have gained by adopting any strategy other than truthfulness. We will begin by focusing on the Correlated Agreement mechanism \citep{shnayder2016informed} but may also test other mechanisms or develop custom variations on mechanisms as we see fit.
+
+
+\bibliography{bibliography}
+\bibliographystyle{plainnat}
+
+\end{document}
