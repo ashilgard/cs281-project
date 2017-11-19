@@ -36,6 +36,27 @@ In each of the following definitions let $[n] = \{1, \dots, n\}$. The goal of th
 %\section{Changes Since Proposal}
 % (c) include results for at least some baselines or, for more theoretical projects, any proof attempts so far.
 
+\section{Preliminary Strategy}
+The approach described in \citet{agarwal2017peer} demonstrates that, even with heterogeneous users, proper clustering can guarantee $\epsilon$-informed truthfulness when applying the correlated agreement (CA) mechanism within a given cluster. Here, we will show the empirical performance of mechanisms like CA, when users are clustered with various ML algorithms. \\Our distance metric will be defined using the delta matrices described in the previous section. The distance $Z_{p,q}$ between any two users, $p$ and $q$, will be the 1-norm of their delta matrices (we may experiment with different norms):
+
+$$ Z_{p,q} = | \Delta_{p,q} | $$
+
+In order to determine the likelihood of agents belonging to a given cluster, we must determine the distance between the agent and the centroid of that cluster. Consequently, we can treat the $k_{th}$ cluster centroid as a ’prototype agent’, $C_k$. A prototype agent is defined by its joint signal probabilities $D_{C_k,q}(i,j)$ for all agents $q$ and signal types $i, j$. It is additionally defined by its marginal signal probabilities, $D_{C_k}(l)$, for all signal types $l$. If $N$ is the number of agents in consideration and $L$ is the number of signal types, we may encode the prototype agent's parameters with an $N \times L \times L$ matrix, \textbf{H}:  
+
+$$ \mathbf{H}_{C_k}(q, i, j) = D_{C_k, q} (i, j) $$
+	
+	Thus the prototype agent $C_k$ can be complete defined by its joint signal distributions, $\mathbf{H}_{C_k}$, and its marginal signal distributions $D_{C_k}$. The distance between any given agent $q$ and a prototype, $C_k$, is calculated the same way it is between agents:
+	
+$$ Z_{C_k, q} = | \Delta_{C_k, q} | $$
+
+	This is an adaptive framework that we may test for a variety of different clustering algorithms available. For a simple $k$-means approach, we may use a uniform categorical prior across all $K$ different prototypes. We can determine the cluster's MLE/MAP parameters by minimizing MSE of the distance between the prototype and all agents in its cluster:
+	
+$$ \textrm{MSE} = \sum_{q \in k} Z_{C_k, q}^2 $$
+
+	Though we are not limited to $k$-means. We may use this distance metric in a variety of clustering strategies, including $k$-means, Dirichlet Process clustering, and neural net cluster techniques. \\
+	
+	Different clustering assignments will lead to different degrees of expected regret for the agents within that cluster. We can alternatively use this measure to define our loss. This may more effectively optimize the clusters for agent truthfulness. However, as described in the next section, we are still developing our regret calculations. 
+
 \section{Baselines and Approaches}
 We intend to first test our methods on datasets with simpler, more interpretable signals like those used to develop the empirical portion of \citet{agarwal2017peer}. The Adult Dataset (\texttt{https://github.com/ipeirotis/Get-Another-Label}) and HCB Dataset \\ (\texttt{http://ir.ischool.utexas.edu/square/data.html}) both have relatively high upper bounds on the truthfulness for low numbers of clusters and exhibit some degree of personal judgment in their tasks, identifying the sexual content rating of websites and assessing relevance of web results, respectively. These characteristics suggest that these may be more interesting targets for studies of heterogeneity in users than, for example, labeling dog breeds. \\
 

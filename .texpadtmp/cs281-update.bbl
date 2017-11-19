@@ -1,0 +1,42 @@
+\begin{thebibliography}{5}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Agarwal et~al.(2017)Agarwal, Mandal, Parkes, and
+  Shah]{agarwal2017peer}
+Arpit Agarwal, Debmalya Mandal, David~C Parkes, and Nisarg Shah.
+\newblock Peer prediction with heterogeneous users.
+\newblock 2017.
+
+\bibitem[Dawid and Skene(1979)]{dawid1979maximum}
+Alexander~Philip Dawid and Allan~M Skene.
+\newblock Maximum likelihood estimation of observer error-rates using the em
+  algorithm.
+\newblock \emph{Applied statistics}, pages 20--28, 1979.
+
+\bibitem[Shnayder et~al.(2016)Shnayder, Agarwal, Frongillo, and
+  Parkes]{shnayder2016informed}
+Victor Shnayder, Arpit Agarwal, Rafael Frongillo, and David~C Parkes.
+\newblock Informed truthfulness in multi-task peer prediction.
+\newblock In \emph{Proceedings of the 2016 ACM Conference on Economics and
+  Computation}, pages 179--196. ACM, 2016.
+
+\bibitem[Ungar et~al.(2012)Ungar, Mellers, Satop{\"a}{\"a}, Tetlock, and
+  Baron]{ungar2012good}
+Lyle~H Ungar, Barbara~A Mellers, Ville Satop{\"a}{\"a}, Philip Tetlock, and Jon
+  Baron.
+\newblock The good judgment project: A large scale test of different methods of
+  combining expert predictions.
+\newblock In \emph{AAAI Fall Symposium: Machine Aggregation of Human Judgment},
+  2012.
+
+\bibitem[Witkowski et~al.(2017)Witkowski, Atanasov, Ungar, and
+  Krause]{witkowski2017proper}
+Jens Witkowski, Pavel Atanasov, Lyle~H Ungar, and Andreas Krause.
+\newblock Proper proxy scoring rules.
+\newblock In \emph{AAAI}, pages 743--749, 2017.
+
+\end{thebibliography}
