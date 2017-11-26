@@ -40,7 +40,7 @@ def compute_individual_dist(df):
     
     return completed, values, individual
 
-def compute_deltas(user_index, completed, values, individual, mask, score=False, zero_vals=0):
+def compute_deltas(user_index, completed, values, individual, mask, score=False, threshold=0):
     overlapping_task_values = np.multiply(completed[user_index], values)
     overlapping_task_values = overlapping_task_values*mask
     a = np.multiply(overlapping_task_values[user_index], overlapping_task_values)
@@ -52,6 +52,9 @@ def compute_deltas(user_index, completed, values, individual, mask, score=False,
     # test = (dict(zip(zip(ind//a.shape[1],np.real(u)), cnt)))
     joint = np.zeros_like(a)
     np.put(joint, ((ind - ind%a.shape[1]) + np.real(u)).astype(int), cnt)
+    datapts = joint[:,1:].sum(axis=1)
+    #print(datapts)
+    joint = joint + 1
     joint = joint/joint[:,1:].sum(axis=1)[:,None]
     
     num_vals = individual.shape[1]
@@ -63,8 +66,11 @@ def compute_deltas(user_index, completed, values, individual, mask, score=False,
                      individual.reshape(individual.shape[0],num_vals))
     delta_matrices = joint - dots
 #     true_matrix_idx = np.logical_and(~np.any(joint==0, axis=(1,2)),~np.any(np.isnan(joint), axis=(1,2)))
-    true_matrix_idx = np.logical_and(np.sum(joint==0, axis=(1,2))<=zero_vals,~np.any(np.isnan(delta_matrices), axis=(1,2)))
+    #true_matrix_idx = np.logical_and(np.sum(joint==0, axis=(1,2))<=zero_vals,~np.any(np.isnan(delta_matrices), axis=(1,2)))
 #     true_matrix_idx = ~np.any(np.isnan(joint), axis=(1,2))
+    true_matrix_idx = datapts>=threshold
+    true_matrix_idx[user_index] = False
+    #print(true_matrix_idx)
     #print(np.sum(true_matrix_idx))
     clustering_img = np.empty((joint.shape))
     clustering_img.fill(np.nan)
@@ -102,6 +108,7 @@ def best_expected_score_sp(score_matrices, delta_matrices, tmi):
     sigs = score_matrices[0].shape[0]
     
     true_matrix_idx = np.where(tmi==True)[0]
+    #print(true_matrix_idx)
 
     fun = lambda FG: - np.average([np.sum(np.sum(np.einsum('ij,lk->iljk', FG[:sigs**2].reshape(sigs,sigs),FG[(sigs**2)*i:(sigs**2)*(i+1)].reshape(sigs,sigs))*score_matrices[true_matrix_idx[i]],\
                                      axis=(2,3))*delta_matrices[true_matrix_idx[i]]) for i in range(len(true_matrix_idx))])
@@ -120,4 +127,4 @@ def regret(score_matrices, delta_matrices, true_matrix_idx):
     res = best_expected_score_sp(score_matrices, delta_matrices, true_matrix_idx)
     best_score = -res['fun']
     truth_score = np.average([expected_score(score_matrices[i], delta_matrices[i], np.array(range(sigs)),np.array(range(sigs))) for i in np.where(true_matrix_idx==True)[0]])
-    return best_score - truth_score
+    return best_score - truth_score, truth_score
