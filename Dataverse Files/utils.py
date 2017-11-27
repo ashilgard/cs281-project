@@ -55,13 +55,15 @@ def compute_deltas(user_index, completed, values, individual, mask, score=False,
     datapts = joint[:,1:].sum(axis=1)
     #print(datapts)
     joint = joint + 1
-    joint = joint/joint[:,1:].sum(axis=1)[:,None]
+    #joint = joint/joint[:,1:].sum(axis=(1,2))[:,None,None]
+                                
     
     num_vals = individual.shape[1]
     prime_vals = np.array(primes[:num_vals])
     idx = prime_vals.reshape(num_vals,1).dot(prime_vals.reshape(1,num_vals)).flatten()
     
     joint = joint[:,idx].reshape(a.shape[0],num_vals,num_vals)
+    joint = joint/np.sum(joint, axis=(1,2))[:,None,None]
     dots = np.einsum('...ij,...kl->kil',individual[user_index].reshape(num_vals,1), \
                      individual.reshape(individual.shape[0],num_vals))
     delta_matrices = joint - dots
@@ -74,7 +76,7 @@ def compute_deltas(user_index, completed, values, individual, mask, score=False,
     #print(np.sum(true_matrix_idx))
     clustering_img = np.empty((joint.shape))
     clustering_img.fill(np.nan)
-    clustering_img[true_matrix_idx] = joint[true_matrix_idx]
+    clustering_img[true_matrix_idx] = delta_matrices[true_matrix_idx]
     if score==False:
         return delta_matrices, true_matrix_idx, clustering_img
     else:
