@@ -5,24 +5,36 @@ from scipy.optimize import minimize
 
 primes = [2,3,5,7,11,13]
 
-def create_user_task_ids(df, user_col, task_col, values_col):
+def create_user_task_ids(df, user_col, task_col, values_col, prime=False, numeric=False):
     y = pd.Series(range(len(df[task_col].unique())), index=df[task_col].unique())
     x = pd.Series(range(len(df[user_col].unique())), index=df[user_col].unique())
-    v = pd.Series(primes[:len(df[values_col].unique())], index=df[values_col].unique())
+    if numeric==False:
+        if prime==True:
+            v = pd.Series(primes[:len(df[values_col].unique())], index=df[values_col].unique())
+        else:
+            v = pd.Series(range(len(df[values_col].unique())), index=sorted(df[values_col].unique()))
+        df['bin'] = df[values_col].map(v)
+    else:
+        df['bin'] = df[values_col]
     df['task_id'] = df[task_col].map(y)
     df['uid'] = df[user_col].map(x)
-    df['bin'] = df[values_col].map(v)
     return df
 
-def compute_individual_dist(df):
+def compute_individual_dist(df, bin_levels=False, full_dist=True):
     
     completed = np.zeros((len(df['uid'].unique()), len(df['task_id'].unique())))
     completed[df['uid'].values, df['task_id'].values] = 1
     
     values = np.zeros((len(df['uid'].unique()), len(df['task_id'].unique())))
-    values[df['uid'].values, df['task_id'].values] = df['bin'].values
+    if bin_levels==True:
+        values[df['uid'].values, df['task_id'].values] = df['bin_levels'].values
+    else:
+        values[df['uid'].values, df['task_id'].values] = df['bin'].values
     
-    cols_ = primes[:len(df['bin'].unique())]
+    if bin_levels==True:
+        cols_ = primes[:len(df['bin_levels'].unique())]
+    else:
+        cols_ = primes[:len(df['bin'].unique())]
     #add a unique complex number to each row
     weight = 1j*np.linspace(0, values.shape[1], values.shape[0], endpoint=False)
     individual = values + weight[:, np.newaxis]
@@ -32,11 +44,12 @@ def compute_individual_dist(df):
     np.put(individual, ((ind - ind%values.shape[1]) + np.real(u)).astype(int), cnt)
     individual = individual/individual[:,1:].sum(axis=1)[:,None]
     individual = individual[:,cols_]
-    full_dist = ~np.any(individual==0, axis=1)
-    user_ids = np.where(full_dist==True)
-    values = values[full_dist,:]
-    completed = completed[full_dist, :]
-    individual = individual[full_dist,:]
+    if full_dist==True:
+        full_dist = ~np.any(individual==0, axis=1)
+        user_ids = np.where(full_dist==True)
+        values = values[full_dist,:]
+        completed = completed[full_dist, :]
+        individual = individual[full_dist,:]
     
     return completed, values, individual
 
