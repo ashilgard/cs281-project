@@ -14,10 +14,11 @@
 \begin{document}
 
 \twocolumn[
-\icmltitle{Project Template}
+\icmltitle{Using Non-Task Data To Solve Cold Start Problems in Heterogeneous Peer Prediction}
 \begin{icmlauthorlist}
-  \icmlauthor{Alexander M. Rush}{}
-\icmlauthor{Yuntian Deng}{}
+\icmlauthor{Brian Hentschel}{}
+  \icmlauthor{Anna S. Hilgard}{}
+\icmlauthor{Casey Meehan}{}
 \end{icmlauthorlist}
 
 \vskip 0.3in
@@ -37,23 +38,35 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Example Structure:
-\begin{itemize}
-\item What is the problem of interest and what (high-level) are the current best methods for solving it?
-\item How do you plan to improve/understand/modify this or related methods?
-\item Preview your research process, list the contributions you made, and summarize your experimental findings.
-\end{itemize}
-\lipsum[1-4]
+%Example Structure:
+%\begin{itemize}
+%\item What is the problem of interest and what (high-level) are the current best methods for solving it?
+%\item How do you plan to improve/understand/modify this or related methods?
+%\item Preview your research process, list the contributions you made, and summarize your experimental findings.
+%\end{itemize}
+
+In peer prediction settings with heterogeneous users, the goal is to make truthful reporting a low-regret strategy for any agent. To fully minimize expected regret while allowing for heterogeneity, this would require the computation and use of individualized user-user signal correlations for every pair of users. This is in general computationally infeasible, so methodologies typically focus instead on clustering similar users while trying to minimally distort their individual signal distributions. 
+
+Additionally, because this method explicitly requires an existing signal distribution, there is a cold start problem: if we do not already have a significant amount of task data for a new user, we cannot know how properly to reward them in comparison to their peers. In our project, we focus on two specific goals:
+\begin{enumerate}\item Clustering is usually done by comparing each user`s reports with other users. We aim to speed up this clustering by using latent variable matrix factorization and then clustering on much smaller latent variables.\item Bootstrapping the clustering process by using non-task data to form an initial clustering before agent reporting begins.
+\end{enumerate}
 
 \section{Background}
-Example Structure:
-\begin{itemize}
-\item What information does a non-expert need to know about the problem domain?
-\item What data exists for this problem?
-\item What are the challenges/opportunities inherent to the data? (High dimensional, sparse, missing data, noise, structure, discrete/continuous, etc?)
-\end{itemize}
-\lipsum[4-8]
+%Example Structure:
+%\begin{itemize}
+%\item What information does a non-expert need to know about the problem domain?
+%\item What data exists for this problem?
+%\item What are the challenges/opportunities inherent to the data? (High dimensional, sparse, missing data, noise, structure, discrete/continuous, etc?)
+%\end{itemize}
 
+In \cite{shnayder2016}, Shnayder et al. prove that the Correlated Agreement multi-task peer prediction mechanism maximally incentivizes truthful reporting without a ground truth for homogeneous users. The CA mechanism can be generalized to non-homogeneous users but requires a prohibitive number of user reports; thus, \cite{agarwal2017} bounds expected regret by clustering users with similar signal-report distributions.  This regret bound is proportional to the L1 difference between user-user '$\Delta$ Matrices' and those of their respective clusters, where a $\Delta$ Matrix of users $q,r$ is defined as: $$D_{q,r}(i,j) = p(\textrm{q reports i, r reports j}) - p(\textrm{q reports i})p(\textrm{r reports j})$$
+The primary dataset we use is that of the Good Judgment Global Forecasting Competition, available at \texttt{https://dataverse.harvard.edu/dataverse.}
+\texttt{xhtml?alias=gjp}. There are many challenges inherent to this dataset. First, the idea of a task is not well-defined. Users enter predictions in continuous time, and the true probability of an event will change over time, such that each minute could be considered a different task (Note that if we expect users only update their predictions in response to new information, these time-question tasks will be independent conditional on the signal). We choose to bucket these responses by week to mediate between the desire to allow for variation in true probability over time while maintaining sufficient task response density. This results in 1,499,294 predictions by 2,052 users on 1,548 tasks. Secondly, the signal itself can be expected to have a high degree of noise, as the probability of any of these global events is not well-defined even in the absence of individual interpretation effects. 
+
+To study the effects of the clustering methodologies in a slightly less noisy realm, we additionally use a second dataset of user judgments on whether or not websites contained adult content. This dataset, termed \emph{Adult}, was pulled from the Square Project at the University of Texas. The data is available at \texttt{https://github.com/ipeirotis/}
+\texttt{Get-Another-Label/tree/master/data}. We limit the dataset to users who gave at least one report of each signal, resulting in 65,144 reports by 389 users on 10,381 tasks.
+
+Both datasets required significant preprocessing to account for sparsity of signal distributions and to compute the $\Delta$ matrices. Additionally, because Good Judgment reports were continuous rather than discrete, we bucketed the responses into five uniform bins, which we use to compute the matrices.
 
 \section{Related Work}
 
