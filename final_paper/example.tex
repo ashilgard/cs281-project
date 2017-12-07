@@ -70,43 +70,57 @@ Both datasets required significant preprocessing to account for sparsity of sign
 
 \section{Related Work}
 
-Example Structure:
-\begin{itemize}
-\item What 3-5 papers have been published in this space?
-\item How do these  differ from your approach?
-\item What data or methodologies do each of these works use?
-\item How do you plan to compare to these methods?
-\end{itemize}
+%Example Structure:
+%\begin{itemize}
+%\item What 3-5 papers have been published in this space?
+%\item How do these  differ from your approach?
+%\item What data or methodologies do each of these works use?
+%\item How do you plan to compare to these methods?
+%\end{itemize}
 
-\citep{agarwal2017} is the only paper we know of specifically considering clustering methods for heterogeneous peer prediction. The paper differs from our work in that it assumes all of the relevant data exists and seeks to prove a theoretical upper bound on regret rather than to study empirical average regret in settings with sparse data. While the authors also use the \emph{Adult} dataset among others, they restrict it to a small subset of only those users for whom there is a full joint distribution between any two users, resulting in only 269 users. Further, while the authors prove a theoretical bound in the case of empirically estimated ground truth, the tests they run on real data rely on the existence of a known ground truth label. This allows them to calculate individual signal confusion matrices using methods developed in \citet{dawid1979maximum} and leverage tensor decomposition techniques from \citet{anandkumar2014tensor} and \citet{zhang2016spectral} to compute average clusters directly. We seek to show that in the more general case of incomplete data with no ground truth labels, clustering instead on user-specific latent variables learned through matrix factorization can lead to similar computational savings as tensor decomposition while eliminating the need for labels.  Further, we show that these computationally efficient clusterings are similarly effective with respect to incentivizing truthfulness as clustering on $\Delta$ matrices directly.
+\citep{agarwal2017} is the only paper we know of specifically considering clustering methods for heterogeneous peer prediction. The paper differs from our work in that it assumes all of the relevant data exists and seeks to prove a theoretical upper bound on regret rather than to study empirical average regret in settings with sparse data. While the authors also use the \emph{Adult} dataset among others, they restrict it to a small subset of only those users for whom there is a full joint distribution between any two users, resulting in only 269 users. 
+
+Further, while the authors prove a theoretical bound in the case of empirically estimated ground truth, the tests they run on real data rely on the existence of a known ground truth label. This allows them to calculate individual signal confusion matrices using methods developed in \citet{dawid1979maximum} and leverage tensor decomposition techniques from \citet{anandkumar2014tensor} and \citet{zhang2016spectral} to compute average clusters directly. We seek to show that in the more general case of incomplete data with no ground truth labels, clustering instead on user-specific latent variables learned through matrix factorization can lead to similar computational savings as tensor decomposition while eliminating the need for labels.  Further, we show that these computationally efficient clusterings are similarly effective with respect to incentivizing truthfulness as clustering on $\Delta$ matrices directly.
 
 The use of the Correlated Agreement mechanism \citep{shnayder2016informed} requires that the $\Delta$ matrices are already known or can be empirically estimated from observed data. Nothing in the peer prediction literature addresses this cold start problem yet. However, it is well studied in the field of matrix factorization. The most similar method to ours, in that it incorporates non-task data, is \citep{kula2015metadata}.
 
 
 \section{Model}
 
-Example Structure:
+%Example Structure:
 
-\begin{itemize}
-\item What is the formal definition of your problem?
-\item What is the precise mathematical model you are using to represent it? In almost all cases this will use the probabilistic language from class, e.g.
-  \begin{equation}
-  z \sim {\cal N}(0, \sigma^2)\label{eq:1}
-\end{equation}
-But it may also be a neural network, or a non-probabilistic loss,
-\[ h_t \gets \mathrm{RNN}(x_{t}, h_{t-1} )\]
+%\begin{itemize}
+%\item What is the formal definition of your problem?
+%\item What is the precise mathematical model you are using to represent it? In almost all cases this will use the probabilistic language from class, e.g.
+%  \begin{equation}
+ % z \sim {\cal N}(0, \sigma^2)\label{eq:1}
+%\end{equation}
+%But it may also be a neural network, or a non-probabilistic loss,
+%\[ h_t \gets \mathrm{RNN}(x_{t}, h_{t-1} )\]
 
-This is also a good place to reference a diagram such as Figure~\ref{fig:diagram}.
+%This is also a good place to reference a diagram such as Figure~\ref{fig:diagram}.
 
-\item What are the parameters or latent variables of this model that you plan on estimating or inferring? Be explicit. How many are there? Which are you assuming are given? How do these relate to the original problem description?
-\end{itemize}
+%\item What are the parameters or latent variables of this model that you plan on estimating or inferring? Be explicit. How many are there? Which are you assuming are given? How do these relate to the original problem description?
+%\end{itemize}
 
-\lipsum[4-8]
+Given a sparse matrix containing tasks, users, and users` reports on each task, the goal is to produce clusters which accurately describe users` reporting behavior. Because of the sparse matrix data, we focus on matrix factorization models to generate latent factor representations of users. That is, we assume that there is some latent variable representation of a user`s forecasting behavior, $u_i$ that interacts with related task-specific factors, $t_j$. These could be thought of, for example as the task`s topic areas and the user`s expertise in those specific topic areas. After transforming the predictions to range from -1 to 1 instead of 0 to 1, we use the following model, shown in Figure~\ref{fig:diagram}:  
+  $$
+  p_{i,j} \sim \mathcal{N}(\textrm{tanh}\left( \mu_{i_M}\left[u_i^{T}t_j + g + \mu_j\right] + \mu_{i_A}\right), \sigma^2)
+ $$
+ 
+ Users tend to exhibit two forms of individualized biases in this space. The multiplicative bias, $\mu_{i_A}$ captures either risk aversion or overconfidence, such that they tend to predict values either closer to or farther from 0 (.5) than are warranted by their knowledge. The additive bias, $ \mu_{i_M}$ captures both availability bias or normalcy bias which would result in user having a tendency to predict a specific level. The task bias $\mu_j$ captures the general prediction likelihood of the task absent user-specific factors, and the global bias $g$ captures the overall mean of the user-task predictions.
+  The tanh restricts the space of the predicted mean to the domain of the target value.
+  
+  Then, we must infer $k+2$ parameters for each user, $k+1$ parameters for each task, and one global bias, where $k$ is the length of the latent vector representation we choose for users and tasks. Only the predictions $p_{i,j}$ are known in this model.
+  
+      For \emph{Adult}, which does not have this probablistic representation and has reports ranging from 1 to 4, we use only additive biases and remove the tanh.
+      
+  XX TODO PREDICTING LATENT USER VECTORS FROM PSYCH DATA XX
 
 \begin{figure}
   \centering
-  \missingfigure[figheight=8cm]{}
-  \caption{\label{fig:diagram} This is a good place to include a diagram showing how your model works. Examples include a graphical model or a neural network block diagram.}
+  \includegraphics[height=8cm]{dgmaccurate.png}
+  \caption{\label{fig:diagram} Model of prediction generation.}
 \end{figure}
 
 
