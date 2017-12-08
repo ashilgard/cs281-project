@@ -126,25 +126,31 @@ Given a sparse matrix containing tasks, users, and users` reports on each task, 
 
 \section{Inference (or Training)}
 
-\begin{itemize}
-\item How do you plan on training your parameters / inferring the
-  states of your latent variables (MLE / MAP / Backprop / VI / EM / BP / ...)
+%\begin{itemize}
+%\item How do you plan on training your parameters / inferring the
+%  states of your latent variables (MLE / MAP / Backprop / VI / EM / BP / ...)
+%
+%\item What are the assumptions implicit in this technique? Is it an approximation or exact? If it is an approximation what bound does it optimize?
+%
+%\item What is the explicit method / algorithm that you derive for learning these parameters?
+%\end{itemize}
 
-\item What are the assumptions implicit in this technique? Is it an approximation or exact? If it is an approximation what bound does it optimize?
-
-\item What is the explicit method / algorithm that you derive for learning these parameters?
-\end{itemize}
-
-\lipsum[4-8]
+For learning the latent user parameters, we use mini-batch stochastic gradient descent to find the maximum likelihood estimate. We choose not to use a prior for regularization as we find that the training and validation performance do not generally diverge. This is likely because there is already enough noise in the training data for each parameter that it is difficult to overfit the model. We do not explicitly code the initialization of the model, so of course it is possible it finds a local rather than global minimum. However, the performance of the model is consistent across random starts.
 
 \begin{algorithm}
   \begin{algorithmic}
-    \STATE{\lipsum[1]}
+  \STATE {learning rate = $\alpha$}
+  \FOR{\textrm{epoch in epochs} }
+  \FOR{\textrm{batch in batches} }
+    \STATE{Calculate the gradient of the MSE Loss for each parameter for all users and tasks in the batch}
+    \STATE{Update the parameters: param $\gets$ param - $\alpha$ * $\frac{d}{dparam}$(MSE Loss) }    
+    \ENDFOR
+    \ENDFOR
   \end{algorithmic}
-  \caption{Your Pseudocode}
+  \caption{Mini-Batch SGD Parameter Fitting}
 \end{algorithm}
 
-
+TODO COLD START MODEL
 
 
 \section{Methods}
@@ -153,7 +159,6 @@ Given a sparse matrix containing tasks, users, and users` reports on each task, 
 \item What are the exact details of the dataset that you used? (Number of data points / standard or non-standard / synthetic or real / exact form of the data)
 
 \item What are the exact details of the features you computed?
-
 
 \item How did you train or run inference? (Optimization method / hyperparameter settings / amount of time ran / what did you implement versus borrow / how were baselines computed).
 
