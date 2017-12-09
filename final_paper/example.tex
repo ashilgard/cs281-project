@@ -155,17 +155,28 @@ TODO COLD START MODEL
 
 \section{Methods}
 
-\begin{itemize}
-\item What are the exact details of the dataset that you used? (Number of data points / standard or non-standard / synthetic or real / exact form of the data)
+%\begin{itemize}
+%\item What are the exact details of the dataset that you used? (Number of data points / standard or non-standard / synthetic or real / exact form of the data)
 
-\item What are the exact details of the features you computed?
+%\item What are the exact details of the features you computed?
 
-\item How did you train or run inference? (Optimization method / hyperparameter settings / amount of time ran / what did you implement versus borrow / how were baselines computed).
+%\item How did you train or run inference? (Optimization method / hyperparameter settings / amount of time ran / what did you implement versus borrow / how were baselines computed).
 
-\item What are the exact details of the metric used?
-\end{itemize}
+%\item What are the exact details of the metric used?
+%\end{itemize}
 
-For the Good Judgment Dataset, we use the file \texttt{survey_fcasts.yr4.tab}, consisting of all user forecasts for the fourth year of the tournament. The file has 1,685,784 lines, each consisting of details about a specific user id and forecast. We restrict to only binary valued questions, for which a single probability of `yes' is given as the answer (as opposed to, for example, ``Who will be inaugurated as President of Russia in 2012?", which had 3 possible answers). We restrict to only users who responded to at least 30 Individual Forecasting Problems (IFPs) over the course of the year. Given that users can (and ideally do) update their predictions for IFPs over time, any given time period could be thought of as a new IFP. Following the scoring procedure of the Good Judgment, we assume that if a user enters a prediction and then does not update it, this implies that they would like their existing prediction to be carried forward.
+For the \emph{Good Judgment} Dataset, we use the file \texttt{survey\_fcasts.yr4.tab}, consisting of all user forecasts for the fourth year of the tournament. The file has 1,685,784 lines, each consisting of details about a specific user id and forecast. We restrict to only binary valued questions, for which a single probability of `yes' is given as the answer (as opposed to, for example, ``Who will be inaugurated as President of Russia in 2012?", which had 3 possible answers). We restrict to only users who responded to at least 30 Individual Forecasting Problems (IFPs) over the course of the year. Given that users can (and ideally do) update their predictions for IFPs over time, any given time period could be thought of as a new IFP. Following the scoring procedure of the Good Judgment, we assume that if a user enters a prediction and then does not update it, this implies that they would like their existing prediction to be carried forward until they do update. We allow each week an IFP is active to be a different prediction task to balance temporal variability in task signals with our desire for higher task report density.
+
+In computing the user latent vectors, we transform the predictions from -1 to 1 as described above to allow for the multiplicative user bias but otherwise allow them to remain continuous. We train with stochastic gradient descent for 50 epochs with a learning rate of .9. 
+
+As a metric of the clustering success, we use the average element-wise L1 distance between clustered $\Delta$ matrices and the original user-user $\Delta$ matrices for each pair of users. This requires binning the continuous predictions into discrete buckets. We choose to use 5 uniformly spaced bins from 0 to 1. We then compute the empirical joint distribution for any two users based on these discrete signals, as well as the empirical signal distributions of each individual. As mentioned above, the $\Delta$ matrices can be calculated from these as 
+$$D_{q,r}(i,j) = p(\textrm{q reports i, r reports j}) - p(\textrm{q reports i})p(\textrm{r reports j})$$
+
+To cluster, we use the scikit-learn implementation of K-means on all cores. The baseline we compare to is that of clustering on the $\Delta$ matrices directly, which is the method described in \citet{agarwal2017} and should in general be better at guaranteeing similarity of $\Delta$ matrices than clustering on other factors. To compute a user`s features for clustering, we append all of the $\Delta$ matrices between that user and all other users, leaving NaNs where not enough data exists to compute a distribution, and flatten this into a vector. When clustering, we iteratively impute feature means for NaNs such that they are not taken into consideration in the clustering. 
+
+For the \emph{Adult} Dataset, 
+
+TODO COLD START MODEL
 
 \section{Results}
 
