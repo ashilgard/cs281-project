@@ -165,7 +165,7 @@ TODO COLD START MODEL
 \item What are the exact details of the metric used?
 \end{itemize}
 
-\lipsum[4-8]
+For the Good Judgment Dataset, we use the file \texttt{survey_fcasts.yr4.tab}, consisting of all user forecasts for the fourth year of the tournament. The file has 1,685,784 lines, each consisting of details about a specific user id and forecast. We restrict to only binary valued questions, for which a single probability of `yes' is given as the answer (as opposed to, for example, ``Who will be inaugurated as President of Russia in 2012?", which had 3 possible answers). We restrict to only users who responded to at least 30 Individual Forecasting Problems (IFPs) over the course of the year. Given that users can (and ideally do) update their predictions for IFPs over time, any given time period could be thought of as a new IFP. Following the scoring procedure of the Good Judgment, we assume that if a user enters a prediction and then does not update it, this implies that they would like their existing prediction to be carried forward.
 
 \section{Results}
 
