@@ -143,7 +143,7 @@ For learning the latent user parameters, we use mini-batch stochastic gradient d
   \FOR{\textrm{epoch in epochs} }
   \FOR{\textrm{batch in batches} }
     \STATE{Calculate the gradient of the MSE Loss for each parameter for all users and tasks in the batch}
-    \STATE{Update the parameters: param $\gets$ param - $\alpha$ * $\frac{d}{dparam}$(MSE Loss) }    
+    \STATE{Update the parameters: \\param $\gets$ param - $\alpha$ * $\frac{d}{dparam}$(MSE Loss) }    
     \ENDFOR
     \ENDFOR
   \end{algorithmic}
@@ -179,28 +179,49 @@ TODO COLD START MODEL
 
 \section{Results}
 
-\begin{itemize}
-\item What were the results comparing previous work / baseline systems / your systems on the main task?
-\item What were the secondary results comparing the variants of your system?
-\item This section should be fact based and relatively dry. What happened, what was significant?
-\end{itemize}
-
-\begin{table*}
-  \centering
-  \missingfigure{}
-  \caption{This is usually a table. Tables with numbers are generally easier to read than graphs, so prefer when possible.}
-  \label{fig:mainres}
-\end{table*}
+%\begin{itemize}
+%\item What were the results comparing previous work / baseline systems / your systems on the main task?
+%\item What were the secondary results comparing the variants of your system?
+%\item This section should be fact based and relatively dry. What happened, what was significant?
+%\end{itemize}
 
 
-\begin{table}
-  \centering
-  \missingfigure[figheight=5cm]{}
-  \caption{Secondary table or figure in results section.}
-  \label{fig:mainres}
+\begin{table}[]
+\centering
+\caption{Distribution of L1 Distances Across Clusterings}
+\label{fig:dist}
+\begin{tabular}{lllll}
+     & $\Delta$ (100) &K=2 (100) & $\Delta$ (500)  & K=2 (500)\\ \hline
+mean & .0168         & .0215   & .0145         & .0192   \\
+std  & .0243         & .0290   & .0218         & .0258   \\
+min  & 0             & 0       & 0             & 0       \\
+25\% & .0021         & .0043   & .0015         & .0036   \\
+50\% & .0084         & .0108   & .0071         & .0099   \\
+75\% & .0216         & .0271   & .0186         & .0244   \\
+max  & .7118         & .6864   & .6536         & .6191  
+\end{tabular}
 \end{table}
 
-\lipsum[7-11]
+\begin{table}[]
+\centering
+\caption{Runtime (s) of KMeans algorithm on User Representation}
+\label{fig:time}
+\begin{tabular}{lllll}
+                         \multicolumn{1}{l|}{Clusters}& $\Delta$ & K=2 & K=3 & K=4 \\ \hline
+\multicolumn{1}{l|}{100} & 423      & .57 & .55 & .65 \\
+\multicolumn{1}{l|}{150} & 625      & .66 & .66 & .66 \\
+\multicolumn{1}{l|}{200} & 800      & .66 & .77 & .87 \\
+\multicolumn{1}{l|}{250} & 959      & .87 & .88 & .97 \\
+\multicolumn{1}{l|}{300} & 1187     & .96 & 1.1 & 1.1 \\
+\multicolumn{1}{l|}{350} & 1198     & 1.1 & 1.2 & 1.2
+\end{tabular}
+\end{table}
+
+While we achieved the lowest training and validation loss using 10 latent user factors (See Figure~\ref{fig:train}), the best L1 loss against the original $\Delta$ matrices was achieved by clustering on only 2 latent user factors (See Figure~\ref{fig:dist}).  Distribution results are given in Table~\ref{fig:dist}
+
+However, clustering on the latent factors for all values of K was significantly faster than clustering directly on the $\Delta$ matrices, as the flattened concatenated matrices result in 51,300 features for each user. See Figure~\ref{fig:time} for details.
+
+TODO COLD START MODEL
 
 \section{Discussion}
 
@@ -213,12 +234,14 @@ TODO COLD START MODEL
 \item  What questions remain open? What did you think might work, but did not?
 \end{itemize}
 
-\lipsum[4-8]
+One possible explanation is that this setup forces more of the user variability into the multiplicative and additive biases, which are more specifically relevant to the task of predicting a distribution of reports given signals. 
 
 \begin{figure}
   \centering
-  \missingfigure{}
-  \missingfigure{}
+  \includegraphics[height=5.6cm]{training.png}
+  \caption{\label{fig:train} Training Results, L1 Loss.}
+  \includegraphics[height=5.6cm]{clust_dist.png}
+  \caption{\label{fig:dist} Average L1 Distance.}
   \missingfigure{}
   \caption{Visualizations of the internals of the system.}
 \end{figure}
