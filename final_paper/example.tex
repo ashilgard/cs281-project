@@ -60,7 +60,7 @@ Additionally, because this method explicitly requires an existing signal distrib
 %\end{itemize}
 
 In \citet{shnayder2016informed}, Shnayder et al. prove that the Correlated Agreement multi-task peer prediction mechanism maximally incentivizes truthful reporting without a ground truth for homogeneous users. The CA mechanism can be generalized to non-homogeneous users but requires a prohibitive number of user reports; thus, \citet{agarwal2017} bounds expected regret by clustering users with similar signal-report distributions.  This regret bound is proportional to the L1 difference between user-user '$\Delta$ Matrices' and those of their respective clusters, where a $\Delta$ Matrix of users $q,r$ is defined as: $$D_{q,r}(i,j) = p(\textrm{q reports i, r reports j}) - p(\textrm{q reports i})p(\textrm{r reports j})$$
-The primary dataset we use is that of the Good Judgment Global Forecasting Competition, available at \texttt{https://dataverse.harvard.edu/dataverse.}
+The primary dataset we use is that of the \emph{Good Judgment Global Forecasting Competition}, available at \texttt{https://dataverse.harvard.edu/dataverse.}
 \texttt{xhtml?alias=gjp}. There are many challenges inherent to this dataset. First, the idea of a task is not well-defined. Users enter predictions in continuous time, and the true probability of an event will change over time, such that each minute could be considered a different task (Note that if we expect users only update their predictions in response to new information, these time-question tasks will be independent conditional on the signal). We choose to bucket these responses by week to mediate between the desire to allow for variation in true probability over time while maintaining sufficient task response density. This results in 1,499,294 predictions by 2,052 users on 1,548 tasks. Secondly, the signal itself can be expected to have a high degree of noise, as the probability of any of these global events is not well-defined even in the absence of individual interpretation effects. 
 
 To study the effects of the clustering methodologies in a slightly less noisy realm, we additionally use a second dataset of user judgments on whether or not websites contained adult content. This dataset, termed \emph{Adult}, was pulled from the Square Project at the University of Texas. The data is available at \texttt{https://github.com/ipeirotis/}
@@ -171,10 +171,9 @@ In computing the user latent vectors, we transform the predictions from -1 to 1 
 
 As a metric of the clustering success, we use the average element-wise L1 distance between clustered $\Delta$ matrices and the original user-user $\Delta$ matrices for each pair of users. This requires binning the continuous predictions into discrete buckets. We choose to use 5 uniformly spaced bins from 0 to 1. We then compute the empirical joint distribution for any two users based on these discrete signals, as well as the empirical signal distributions of each individual. As mentioned above, the $\Delta$ matrices can be calculated from these as 
 $$D_{q,r}(i,j) = p(\textrm{q reports i, r reports j}) - p(\textrm{q reports i})p(\textrm{r reports j})$$
-
 To cluster, we use the scikit-learn implementation of K-means on all cores. The baseline we compare to is that of clustering on the $\Delta$ matrices directly, which is the method described in \citet{agarwal2017} and should in general be better at guaranteeing similarity of $\Delta$ matrices than clustering on other factors. To compute a user`s features for clustering, we append all of the $\Delta$ matrices between that user and all other users, leaving NaNs where not enough data exists to compute a distribution, and flatten this into a vector. When clustering, we iteratively impute feature means for NaNs such that they are not taken into consideration in the clustering. 
 
-For the \emph{Adult} Dataset, 
+The \emph{Adult} Dataset has 92,720 lines, each of which has a report by a user id on a website. Ratings are discrete and ordinal, and we use them as given for both learning latent user variables and for computing $\Delta$ matrices.
 
 TODO COLD START MODEL
 
