@@ -115,7 +115,7 @@ Given a sparse matrix containing tasks, users, and users` reports on each task, 
   
       For \emph{Adult}, which does not have this probablistic representation and has reports ranging from 1 to 4, we use only additive biases and remove the tanh.
       
-  XX TODO PREDICTING LATENT USER VECTORS FROM PSYCH DATA XX
+ TODO PREDICTING LATENT USER VECTORS FROM PSYCH DATA 
 
 \begin{figure}
   \centering
@@ -219,7 +219,7 @@ TODO COLD START MODEL
 
 While we achieved the lowest training and validation loss using 10 latent user factors (See Figure~\ref{fig:train}), the best L1 loss against the original $\Delta$ matrices was achieved by clustering on only 2 latent user factors (See Figure~\ref{fig:clust_dist}).  Distribution results are given in Table~\ref{fig:dist}.
 
-However, clustering on the latent factors for all values of K was significantly faster than clustering directly on the $\Delta$ matrices, as the flattened concatenated matrices result in 51,300 features for each user. See Figure~\ref{fig:time} for details.
+However, clustering on the latent factors for all values of K was significantly faster than clustering directly on the $\Delta$ matrices, as the flattened concatenated matrices result in 51,300 features for each user. See Table~\ref{fig:time} for details.
 
 TODO COLD START MODEL
 
@@ -227,14 +227,18 @@ TODO COLD START MODEL
 
 
 
-\begin{itemize}
-\item What conclusions can you draw from the results section?
-\item Is there further analysis you can do into the results of the system? Here is a good place to include visualizations, graphs, qualitative analysis of your results.
+%\begin{itemize}
+%\item What conclusions can you draw from the results section?
+%\item Is there further analysis you can do into the results of the system? Here is a good place to include visualizations, graphs, qualitative analysis of your results.
 
-\item  What questions remain open? What did you think might work, but did not?
-\end{itemize}
+%\item  What questions remain open? What did you think might work, but did not?
+%\end{itemize}
 
-One possible explanation is that this setup forces more of the user variability into the multiplicative and additive biases, which are more specifically relevant to the task of predicting a distribution of reports given signals. 
+The results show us that it is possible to use a significantly compressed representation of user heterogeneity and still arrive at a clustering that is still almost as successful at encouraging truthful reporting as the significantly more time- and memory-intensive task of clustering directly on the user-user signal distributions. Notably, the user representation we use does not explicitly encode the interactions between any two users` reporting behaviors yet performs nearly as well as the clustering will full knowledge of this data.
+
+We note that the RMSE and L1 loss of the training model are lowest for larger numbers of latent factors, yet the clustering performs best when only two latent factors are used. One possible explanation is that this setup forces more of the user variability into the multiplicative and additive biases, which are more specifically relevant to the task of predicting a distribution of reports given signals. Supporting this interpretation, clustering the \emph{Adult} dataset, which does not have the task structure to allow for modeling known psychological biases (specifically with respect to probability reporting) as its latent user biases, does not degrade as we increase the number of latent factors.
+
+TODO INCLUDE CHART
 
 \begin{figure}
   \centering
