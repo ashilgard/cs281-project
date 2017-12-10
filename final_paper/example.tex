@@ -217,7 +217,7 @@ max  & .7118         & .6864   & .6536         & .6191
 \end{tabular}
 \end{table}
 
-While we achieved the lowest training and validation loss using 10 latent user factors (See Figure~\ref{fig:train}), the best L1 loss against the original $\Delta$ matrices was achieved by clustering on only 2 latent user factors (See Figure~\ref{fig:dist}).  Distribution results are given in Table~\ref{fig:dist}
+While we achieved the lowest training and validation loss using 10 latent user factors (See Figure~\ref{fig:train}), the best L1 loss against the original $\Delta$ matrices was achieved by clustering on only 2 latent user factors (See Figure~\ref{fig:clust_dist}).  Distribution results are given in Table~\ref{fig:dist}.
 
 However, clustering on the latent factors for all values of K was significantly faster than clustering directly on the $\Delta$ matrices, as the flattened concatenated matrices result in 51,300 features for each user. See Figure~\ref{fig:time} for details.
 
@@ -238,10 +238,10 @@ One possible explanation is that this setup forces more of the user variability 
 
 \begin{figure}
   \centering
-  \includegraphics[height=5.6cm]{training.png}
+  \includegraphics[width= \columnwidth]{training.png}
   \caption{\label{fig:train} Training Results, L1 Loss.}
-  \includegraphics[height=5.6cm]{clust_dist.png}
-  \caption{\label{fig:dist} Average L1 Distance.}
+  \includegraphics[width= \columnwidth]{clust_dist.png}
+  \caption{\label{fig:clust_dist} Average L1 Distance.}
   \missingfigure{}
   \caption{Visualizations of the internals of the system.}
 \end{figure}
