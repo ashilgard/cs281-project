@@ -17,7 +17,7 @@
 \begin{document}
 
 \twocolumn[
-\icmltitle{Using Non-Task Data To Solve Cold Start Problems in Heterogeneous Peer Prediction}
+\icmltitle{Latent Variable Matrix Factorization in Heterogeneous Peer Prediction}
 \begin{icmlauthorlist}
 \icmlauthor{Brian Hentschel}{}
   \icmlauthor{Anna S. Hilgard}{}
@@ -56,7 +56,7 @@ Additionally, because this method explicitly requires an existing signal distrib
 \item Bootstrapping the clustering process by using non-task data to form an initial clustering before agent reporting begins.
 \end{enumerate}
 
-\section{Background}
+\section{Background and Related Work}\label{sec:Background}
 %Example Structure:
 %\begin{itemize}
 %\item What information does a non-expert need to know about the problem domain?
@@ -69,6 +69,16 @@ In \citet{shnayder2016informed}, Shnayder et al. prove that the Correlated Agree
 D_{q,r}(i,j) &= p(\textrm{q reports i, r reports j}) \\
 &- p(\textrm{q reports i})p(\textrm{r reports j})
 \end{align*}
+
+As far as we know, \citep{agarwal2017} is the only paper to specifically consider clustering methods for heterogeneous peer prediction. The paper differs from our work in that it assumes all of the relevant data exists and seeks to prove a theoretical upper bound on regret rather than to study empirical average regret in settings with sparse data. To demonstrate this, the authors restrict their dataset to a small subset of only those users for whom there is a full joint distribution between any two users, resulting in only 269 users. 
+
+Further, while the authors prove a theoretical bound in the case of empirically estimated ground truth, the tests they run on real data rely on the existence of a known ground truth label. This allows them to calculate individual signal confusion matrices using methods developed in \citet{dawid1979maximum} and leverage tensor decomposition techniques from \citet{anandkumar2014tensor} and \citet{zhang2016spectral} to compute average clusters directly. We seek to show that in the more general case of incomplete data with no ground truth labels, clustering instead on user-specific latent variables learned through matrix factorization can lead to similar computational savings as tensor decomposition while eliminating the need for labels.  Further, we show that these computationally efficient clusterings are similarly effective with respect to incentivizing truthfulness as clustering on $\Delta$ matrices directly.
+
+The use of the Correlated Agreement mechanism \citep{shnayder2016informed} requires that the $\Delta$ matrices are already known or can be empirically estimated from user reports. However, in practice, newly introduced users have contributed no reports and thereby cannot be clustered accurately. While nothing in the peer prediction literature addresses this cold start problem, it is well studied in the field of matrix factorization. The most similar method to ours, in that it incorporates non-task data, is \citep{kula2015metadata}. 
+
+
+\section{Datasets}
+\subsection{Task Data}
 The primary dataset we use is that of the \emph{Good Judgment Global Forecasting Competition}, available at \texttt{https://dataverse.harvard.edu/dataverse.}
 \texttt{xhtml?alias=gjp}. There are many challenges inherent to this dataset. First, the idea of a task is not well-defined. Users enter predictions in continuous time, and the true probability of an event will change over time, such that each minute could be considered a different task (Note that if we expect users to only update their predictions in response to new information, these time-question tasks will be independent conditional on the signal). We choose to bucket these responses by week to mediate between the desire to allow for variation in true probability over time while maintaining sufficient task response density. This results in 1,499,294 predictions by 2,052 users on 1,548 tasks. Secondly, the signal itself can be expected to have a high degree of noise, as the probability of any of these global events is not well-defined even in the absence of individual interpretation effects. 
 
@@ -77,21 +87,66 @@ To study the effects of the clustering methodologies in a slightly less noisy re
 
 Both datasets required significant preprocessing to account for sparsity of signal distributions and to compute the $\Delta$ matrices. Additionally, because Good Judgment reports were continuous rather than discrete, we bucketed the responses into five uniform bins, which we use to compute the matrices.
 
-\section{Related Work}
+\subsection{Non-Task Data}
+In addition to user predictions (task data), the Good Judgement dataset includes a variety of questions to assess the knowledge and ability of each user as well as their psychological and characteristic makeup. For instance, questions to assess knowledge might ask them about world events or to solve a moth problem. Questions about character might ask them to state on a scale from 1-7 how just they believe the world is. We then use this non-task data to address the cold start problem discussed in section 2. 
 
-%Example Structure:
-%\begin{itemize}
-%\item What 3-5 papers have been published in this space?
-%\item How do these  differ from your approach?
-%\item What data or methodologies do each of these works use?
-%\item How do you plan to compare to these methods?
-%\end{itemize}
+The psychological data contains both binary and ordinal features. A binary feature may be an answer to a 'yes/no' question or whether the user correctly answered a diagnostic math test question. An ordinal feature captures some continuous measure of that user's character, \textit{e.g.} user age or weekly workhours. To discretize ordinal features, we bucket each into a finite set of uniform bins similar to the Good Judgement report data. However, the number of bins is feature-dependent. 
 
-\citep{agarwal2017} is the only paper we know of specifically considering clustering methods for heterogeneous peer prediction. The paper differs from our work in that it assumes all of the relevant data exists and seeks to prove a theoretical upper bound on regret rather than to study empirical average regret in settings with sparse data. While the authors also use the \emph{Adult} dataset among others, they restrict it to a small subset of only those users for whom there is a full joint distribution between any two users, resulting in only 269 users. 
+The dataset consists of 168 features for each of the 2052 users. There are a significant number of missing answers in the dataset. For binary features, we made negative answers into $-1$, missing answers into $0$, and positive answers into $1$. For ordinal features, we filled NaNs in with the average value of that feature. 
 
-Further, while the authors prove a theoretical bound in the case of empirically estimated ground truth, the tests they run on real data rely on the existence of a known ground truth label. This allows them to calculate individual signal confusion matrices using methods developed in \citet{dawid1979maximum} and leverage tensor decomposition techniques from \citet{anandkumar2014tensor} and \citet{zhang2016spectral} to compute average clusters directly. We seek to show that in the more general case of incomplete data with no ground truth labels, clustering instead on user-specific latent variables learned through matrix factorization can lead to similar computational savings as tensor decomposition while eliminating the need for labels.  Further, we show that these computationally efficient clusterings are similarly effective with respect to incentivizing truthfulness as clustering on $\Delta$ matrices directly.
+%\section{Related Work}
+%
+%%Example Structure:
+%%\begin{itemize}
+%%\item What 3-5 papers have been published in this space?
+%%\item How do these  differ from your approach?
+%%\item What data or methodologies do each of these works use?
+%%\item How do you plan to compare to these methods?
+%%\end{itemize}
+%
+%\citep{agarwal2017} is the only paper we know of specifically considering clustering methods for heterogeneous peer prediction. The paper differs from our work in that it assumes all of the relevant data exists and seeks to prove a theoretical upper bound on regret rather than to study empirical average regret in settings with sparse data. While the authors also use the \emph{Adult} dataset among others, they restrict it to a small subset of only those users for whom there is a full joint distribution between any two users, resulting in only 269 users. 
+%
+%Further, while the authors prove a theoretical bound in the case of empirically estimated ground truth, the tests they run on real data rely on the existence of a known ground truth label. This allows them to calculate individual signal confusion matrices using methods developed in \citet{dawid1979maximum} and leverage tensor decomposition techniques from \citet{anandkumar2014tensor} and \citet{zhang2016spectral} to compute average clusters directly. We seek to show that in the more general case of incomplete data with no ground truth labels, clustering instead on user-specific latent variables learned through matrix factorization can lead to similar computational savings as tensor decomposition while eliminating the need for labels.  Further, we show that these computationally efficient clusterings are similarly effective with respect to incentivizing truthfulness as clustering on $\Delta$ matrices directly.
+%
+%The use of the Correlated Agreement mechanism \citep{shnayder2016informed} requires that the $\Delta$ matrices are already known or can be empirically estimated from observed data. Nothing in the peer prediction literature addresses this cold start problem yet. However, it is well studied in the field of matrix factorization. The most similar method to ours, in that it incorporates non-task data, is \citep{kula2015metadata}.
+%
 
-The use of the Correlated Agreement mechanism \citep{shnayder2016informed} requires that the $\Delta$ matrices are already known or can be empirically estimated from observed data. Nothing in the peer prediction literature addresses this cold start problem yet. However, it is well studied in the field of matrix factorization. The most similar method to ours, in that it incorporates non-task data, is \citep{kula2015metadata}.
+%\section{Background}
+%%Example Structure:
+%%\begin{itemize}
+%%\item What information does a non-expert need to know about the problem domain?
+%%\item What data exists for this problem?
+%%\item What are the challenges/opportunities inherent to the data? (High dimensional, sparse, missing data, noise, structure, discrete/continuous, etc?)
+%%\end{itemize}
+%
+%In \citet{shnayder2016informed}, Shnayder et al. prove that the Correlated Agreement multi-task peer prediction mechanism maximally incentivizes truthful reporting without a ground truth for homogeneous users. The CA mechanism can be generalized to non-homogeneous users but requires a prohibitive number of user reports; thus, \citet{agarwal2017} bounds expected regret by clustering users with similar signal-report distributions.  This regret bound is proportional to the L1 difference between user-user '$\Delta$ Matrices' and those of their respective clusters, where a $\Delta$ Matrix of users $q,r$ is defined as: 
+%\begin{align*}
+%D_{q,r}(i,j) &= p(\textrm{q reports i, r reports j}) \\
+%&- p(\textrm{q reports i})p(\textrm{r reports j})
+%\end{align*}
+%The primary dataset we use is that of the \emph{Good Judgment Global Forecasting Competition}, available at \texttt{https://dataverse.harvard.edu/dataverse.}
+%\texttt{xhtml?alias=gjp}. There are many challenges inherent to this dataset. First, the idea of a task is not well-defined. Users enter predictions in continuous time, and the true probability of an event will change over time, such that each minute could be considered a different task (Note that if we expect users to only update their predictions in response to new information, these time-question tasks will be independent conditional on the signal). We choose to bucket these responses by week to mediate between the desire to allow for variation in true probability over time while maintaining sufficient task response density. This results in 1,499,294 predictions by 2,052 users on 1,548 tasks. Secondly, the signal itself can be expected to have a high degree of noise, as the probability of any of these global events is not well-defined even in the absence of individual interpretation effects. 
+%
+%To study the effects of the clustering methodologies in a slightly less noisy realm, we additionally use a second dataset of user judgments on whether or not websites contained adult content. This dataset, termed \emph{Adult}, was pulled from the Square Project at the University of Texas. The data is available at \texttt{https://github.com/ipeirotis/}
+%\texttt{Get-Another-Label/tree/master/data}. We limit the dataset to users who gave at least one report of each signal, resulting in 65,144 reports by 389 users on 10,381 tasks.
+%
+%Both datasets required significant preprocessing to account for sparsity of signal distributions and to compute the $\Delta$ matrices. Additionally, because Good Judgment reports were continuous rather than discrete, we bucketed the responses into five uniform bins, which we use to compute the matrices.
+%
+%\section{Related Work}
+%
+%%Example Structure:
+%%\begin{itemize}
+%%\item What 3-5 papers have been published in this space?
+%%\item How do these  differ from your approach?
+%%\item What data or methodologies do each of these works use?
+%%\item How do you plan to compare to these methods?
+%%\end{itemize}
+%
+%\citep{agarwal2017} is the only paper we know of specifically considering clustering methods for heterogeneous peer prediction. The paper differs from our work in that it assumes all of the relevant data exists and seeks to prove a theoretical upper bound on regret rather than to study empirical average regret in settings with sparse data. While the authors also use the \emph{Adult} dataset among others, they restrict it to a small subset of only those users for whom there is a full joint distribution between any two users, resulting in only 269 users. 
+%
+%Further, while the authors prove a theoretical bound in the case of empirically estimated ground truth, the tests they run on real data rely on the existence of a known ground truth label. This allows them to calculate individual signal confusion matrices using methods developed in \citet{dawid1979maximum} and leverage tensor decomposition techniques from \citet{anandkumar2014tensor} and \citet{zhang2016spectral} to compute average clusters directly. We seek to show that in the more general case of incomplete data with no ground truth labels, clustering instead on user-specific latent variables learned through matrix factorization can lead to similar computational savings as tensor decomposition while eliminating the need for labels.  Further, we show that these computationally efficient clusterings are similarly effective with respect to incentivizing truthfulness as clustering on $\Delta$ matrices directly.
+%
+%The use of the Correlated Agreement mechanism \citep{shnayder2016informed} requires that the $\Delta$ matrices are already known or can be empirically estimated from observed data. Nothing in the peer prediction literature addresses this cold start problem yet. However, it is well studied in the field of matrix factorization. The most similar method to ours, in that it incorporates non-task data, is \citep{kula2015metadata}.
 
 
 \section{Model}
@@ -119,14 +174,14 @@ Given a sparse matrix containing tasks, users, and users` reports on each task, 
   p_{i,j} \sim \mathcal{N}(\textrm{tanh}\left( \mu_{i_M}\left[u_i^{T}t_j + g + \mu_j\right] + \mu_{i_A}\right), \sigma^2)
  $$
  
- Users tend to exhibit two forms of individualized biases in this space. The multiplicative bias, $\mu_{i_A}$ captures either risk aversion or overconfidence, such that they tend to predict values either closer to or farther from 0 (.5) than are warranted by their knowledge. The additive bias, $ \mu_{i_M}$ captures both availability bias or normalcy bias which would result in user having a tendency to predict a specific level. The task bias $\mu_j$ captures the general prediction likelihood of the task absent user-specific factors, and the global bias $g$ captures the overall mean of the user-task predictions.
+Users tend to exhibit two forms of individualized biases in this space. The multiplicative bias, $\mu_{i_A}$ captures either risk aversion or overconfidence, such that they tend to predict values either closer to or farther from 0 (.5) than are warranted by their knowledge. The additive bias, $ \mu_{i_M}$ captures both availability bias or normalcy bias which would result in user having a tendency to predict a specific level. The task bias $\mu_j$ captures the general prediction likelihood of the task absent user-specific factors, and the global bias $g$ captures the overall mean of the user-task predictions.
   The tanh restricts the space of the predicted mean to the domain of the target value.
   
   Then, we must infer $k+2$ parameters for each user, $k+1$ parameters for each task, and one global bias, where $k$ is the length of the latent vector representation we choose for users and tasks. Only the predictions $p_{i,j}$ are known in this model.
   
       For \emph{Adult}, which does not have this probablistic representation and has reports ranging from 1 to 4, we use only additive biases and remove the tanh.
       
-\subsection{Using Non-Task Data to Extend the Model for Cold Start Users}
+\subsection{Using Non-Task Data to Extend the Model for Cold Start Users}\label{ssec:non-task}
 
 \begin{figure}[t]
   \centering
@@ -135,15 +190,17 @@ Given a sparse matrix containing tasks, users, and users` reports on each task, 
 \end{figure}
  
            
-The good judgement matrix factorization model depends on an accurate estimation of various individual user parameters, requiring several predictions from a user before accurate predictions can be made. To mitigate these concerns, we use non-task psychological data to try to predict a users latent variables. We do this in one of two ways:
+The good judgement matrix factorization model depends on an accurate estimation of various individual user parameters, requiring several predictions from a user before accurate predictions can be made. To mitigate these concerns, we use non-task psychological data to try to predict a users latent variables. This is easier than predicting a user's cluster as it leads to an intuitive distance metric for training, whereas trying to directly predict the user's cluster provides only a very hard binary classification task.
+
+We focus only on the prediction of user latent vectors from non prediction data. Similar techniques could be used to solve the cold-start problem for tasks, however this would require data about tasks which come in before predictions. This is not part of the standard Good Judgement dataset and we did not explore feature engineering to create pre-prediction task data. An interesting direction for future work would be to consider natural language analysis techniques on text to create pre-prediction task data. For predicting the user latent variable models from psychological data, we try two separate techniques: 
 
 \noindent\textbf{1. Predict latent variables from psychological data: } In our first model, we try predicting a user's latent variable representation directly from their psychological data. We use both a more interpretable simple linear regression model and a less interpretable fully connected neural network to perform the predictions. Then, it would be possible to make a prediction of a user's task report using a weighted combination of the predicted latent variables and the trained latent variables from matrix factorization. 
 
-\noindent\textbf{2. Create user latent variable representation by summing feature latent variables} In this model, adapted from \citep{kula2015metadata}, a user's latent variable representation is created through a summation of various feature latent variables. If $f$ is a set of features, then each feature has a latent vector $\mathbf{L_{f}}$. Then for user $u$ with feature values $u_{f}$, the user's latent variable representation is $$\sum_{i=1}^{\vert f \vert} u_{f} \mathbf{L_{f}} + \mathbf{L_{u}}$$ where $\mathbf{L_{u}}$ is a user-specific latent vector which starts at $\mathbf{0}$. Thus, a user's predictions start by using latent vector $\sum_{i=1}^{\vert f \vert} u_{f} \mathbf{L_{f}}$ and start taking into account a user-specific latent vector $\mathbf{L_{u}}$ as data comes in and moves this value off $\mathbf{0}$.
+\noindent\textbf{2. Create user latent variable representation by summing feature latent variables} In this model, adapted from \citep{kula2015metadata}, a user's latent variable representation is created through a summation of various feature latent variables. If $f$ is a set of features, then each feature has a latent vector $\mathbf{L_{f}}$. Then for user $i$ with feature values $u_{if}$, the user's latent variable representation is $$u_{i} = \sum_{i=1}^{\vert f \vert} u_{if} \mathbf{L_{f}} + \mathbf{L_{u_{i}}}$$ where $\mathbf{L_{u_{i}}}$ is a user-specific latent vector which starts at $\mathbf{0}$. Then, predictions for a user start by using latent vector $\sum_{i=1}^{\vert f \vert} u_{f} \mathbf{L_{f}}$ only as the user-specific latent variable starts at $\mathbf{0}$. As data on the user comes in, the user-specific latent vector $\mathbf{L_{u}}$ moves away from $\mathbf{0}$. Predictions are then made as usual through  $$
+  p_{i,j} = \textrm{tanh}\left( \mu_{i_M}\left[u_i^{T}t_j + g + \mu_j\right] + \mu_{i_A}\right)
+ $$
 
-
-
-\section{Inference (or Training)}
+\section{Training}\label{sec:training}
 
 %\begin{itemize}
 %\item How do you plan on training your parameters / inferring the
@@ -169,7 +226,13 @@ For learning the latent user parameters, we use mini-batch stochastic gradient d
   \caption{Mini-Batch SGD Parameter Fitting}
 \end{algorithm}
 
-TODO COLD START MODEL
+In the above algorithm, parameters include user and task specific biases, the global bias, the latent vectors for tasks, and the latent vectors for specific users as well as user features. In \citep{kula2015metadata}, the user feature latent vectors were trained at the same time as user specific latent vectors. However, for reasons described below, we find that it makes more sense to train  the latent variable model first only for user feature latent vectors. Then, after locking the user feature latent vectors and a corresponding set of parameters: $\{t_{1},g_{1}, \mu_{1j}\}$, we then train a set of user specific latent vectors and a second set of parameters $\{t_{2},g_{2}, \mu_{2j}\}$. Reports for new users are predicted as $$
+  p_{i,j} = \textrm{tanh}\left(u_i^{T}t_{1j} + g_{1} + \mu_{1j}\right)
+ $$ where $u_{i}$ is formed as described in Section \ref{ssec:non-task}. Reports for all other users are predicted as $$p_{i,j} = \textrm{tanh}\left( \mu_{i_M}\left[u_i^{T}t_j + g + \mu_j\right] + \mu_{i_A}\right)$$ where $\{t_{j}, g, \mu_{j}$ are formed through a respective summation of $\{t_{1},g_{1}, \mu_{1j}\}$ and $\{t_{2},g_{2}, \mu_{2j}\}$ and $u_{i}$ is formed as described in Section \ref{ssec:non-task}. 
+
+There are two reasons that we train the user feature vectors before the individual user biases. First, while the model incorporating user feature biases is clearly more general than vanilla matrix factorization, it has more parameters and can be sensitive to the learning rate. In particular, we found that training all at once provided a worse RMSE on the predicted report values than vanilla matrix factorization, with the former having a RMSE of 0.33 and the latter having an RMSE of 0.28. This is most likely due to a too high learning rate, but the model already takes a significant time to converge at the high learning rate. If we train the user feature vectors first, and then the individual user latent vectors, the final RMSE was 0.25. 
+
+Additionally, the model above does not a unique global minimum. To see this, assume we are at some global minumum and there exists binary feature $f$. Then consider subtracting some $k$ dimensional vector $a_{k}$ from the feature latent vector $\mathbf{L_{f}}$ and then adding the same vector to each user latent vector $L_{u_{i}}$ with $u_{i}$ having feature $f$. Then, $u_{i} = \sum_{i=1}^{\vert f \vert} u_{if} \mathbf{L_{f}} + \mathbf{L_{u_{i}}}$ is the same for each user and so we still have the same globally minimum error. Thus, we seek to train our data in such a way that the user feature latent vectors are informative as possible. One way to achieve this is to train only the user feature latent variables first and minimize loss, and then to train the individual user latent vectors after. 
 
 
 \section{Methods}
@@ -186,15 +249,22 @@ TODO COLD START MODEL
 
 For the \emph{Good Judgment} Dataset, we use the file \texttt{survey\_fcasts.yr4.tab}, consisting of all user forecasts for the fourth year of the tournament. The file has 1,685,784 lines, each consisting of details about a specific user id and forecast. We restrict to only binary valued questions, for which a single probability of `yes' is given as the answer (as opposed to, for example, ``Who will be inaugurated as President of Russia in 2012?", which had 3 possible answers). We restrict to only users who responded to at least 30 Individual Forecasting Problems (IFPs) over the course of the year. Given that users can (and ideally do) update their predictions for IFPs over time, any given time period could be thought of as a new IFP. Following the scoring procedure of the Good Judgment, we assume that if a user enters a prediction and then does not update it, this implies that they would like their existing prediction to be carried forward until they do update. We allow each week an IFP is active to be a different prediction task to balance temporal variability in task signals with our desire for higher task report density.
 
-In computing the user latent vectors, we transform the predictions from -1 to 1 as described above to allow for the multiplicative user bias but otherwise allow them to remain continuous. We train with stochastic gradient descent for 50 epochs with a learning rate of .9. 
+In computing the user latent vectors, we transform each prediction p from the range $[0,1]$ to $[-1, 1]$ via the transformation $$p = (p - 0.5) * 2$$. This puts the predictions over the entire range of the tanh function and makes it so the the multiplicative user bias smoothly transforms data towards predictions of $1$ or $-1$ (as opposed to outside the range). We train with stochastic gradient descent for 75 epochs with a learning rate of .2. 
 
-As a metric of the clustering success, we use the average element-wise L1 distance between clustered $\Delta$ matrices and the original user-user $\Delta$ matrices for each pair of users. This requires binning the continuous predictions into discrete buckets. We choose to use 5 uniformly spaced bins from 0 to 1. We then compute the empirical joint distribution for any two users based on these discrete signals, as well as the empirical signal distributions of each individual. As mentioned above, the $\Delta$ matrices can be calculated from these as 
-$$D_{q,r}(i,j) = p(\textrm{q reports i, r reports j}) - p(\textrm{q reports i})p(\textrm{r reports j})$$
-To cluster, we use the scikit-learn implementation of K-means on all cores. The baseline we compare to is that of clustering on the $\Delta$ matrices directly, which is the method described in \citet{agarwal2017} and should in general be better at guaranteeing similarity of $\Delta$ matrices than clustering on other factors. To compute a user`s features for clustering, we append all of the $\Delta$ matrices between that user and all other users, leaving NaNs where not enough data exists to compute a distribution, and flatten this into a vector. When clustering, we iteratively impute feature means for NaNs such that they are not taken into consideration in the clustering. 
+\subsection{Clustering} As a metric of the clustering success, we use the average element-wise L1 distance between clustered $\Delta$ matrices and the original user-user $\Delta$ matrices for each pair of users. This requires binning the continuous predictions into discrete buckets. We choose to use 5 uniformly spaced bins from 0 to 1. We then compute the empirical joint distribution for any two users based on these discrete signals, as well as the empirical signal distributions of each individual. As mentioned in Section \ref{sec:Background}, the $\Delta$ matrices can be calculated from these as:
+\begin{align*}
+D_{q,r}(i,j) &= p(\textrm{q reports i, r reports j}) \\
+&- p(\textrm{q reports i})p(\textrm{r reports j})
+\end{align*}
+To cluster, we use the scikit-learn implementation of K-means on all cores. The baseline we compare to is that of clustering on the $\Delta$ matrices directly, which is the method described in \citet{agarwal2017} and should in general be better at guaranteeing similarity of $\Delta$ matrices than clustering on other factors. In regards to user coordinates for clustering, we append all of the $\Delta$ matrices between that user and all other users, leaving NaNs where not enough data exists to compute a distribution, and flatten this into a vector. When clustering, we iteratively impute coordinate means for NaNs such that they are not taken into consideration in the clustering. 
 
 The \emph{Adult} Dataset has 92,720 lines, each of which has a report by a user id on a website. Ratings are discrete and ordinal, and we use them as given for both learning latent user variables and for computing $\Delta$ matrices.
 
-TODO COLD START MODEL
+\subsection{Cold Start Problem}
+
+As described in Section \ref{sec:training}, in the cold start problem we focus on predicting latent variables directly instead of on predicting clusters. In technique 1, we predict latent variables from labeled data coming from vanilla matrix factorization. So this takes as input the results of a complete matrix factorization, so that we have labeled data for each user of (user id, psychological data) $\times$ (latent vector representation). The first technique we tried was to perform simple linear regression over the psychological features onto the latent vector representations. In the second case, we trained a fully connected neural network. We tried 3 and 4 layers for the network, and varied the number of internal nodes between 20 and 80 for both layers. We found the best performance with a shallow network of just 3 layers and a middle layer of 20 nodes. Both techniques use out of the box PyTorch libraries. 
+
+For the second technique of using user feature dependent latent vectors, we implemented the model using PyTorch. The model was then trained using stochastic gradient descent, with a learning rate of 0.2. We took 75 iterations to train the matrix factorization unless otherwise noted. 
 
 \section{Results}
 
