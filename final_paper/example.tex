@@ -8,6 +8,9 @@
 \usepackage{algorithmic}
 \usepackage{lipsum}
 \usepackage{todonotes}
+\usepackage {mathtools}
+\usepackage{amsthm}
+\usepackage{amsmath}
 \usepackage[accepted]{icml2017}
 \icmltitlerunning{CS 281 Final Project Template}
 
@@ -48,7 +51,9 @@
 In peer prediction settings with heterogeneous users, the goal is to make truthful reporting a low-regret strategy for any agent. To fully minimize expected regret while allowing for heterogeneity, this would require the computation and use of individualized user-user signal correlations for every pair of users. This is in general computationally infeasible, so methodologies typically focus instead on clustering similar users while trying to minimally distort their individual signal distributions. 
 
 Additionally, because this method explicitly requires an existing signal distribution, there is a cold start problem: if we do not already have a significant amount of task data for a new user, we cannot know how properly to reward them in comparison to their peers. In our project, we focus on two specific goals:
-\begin{enumerate}\item Clustering is usually done by comparing each user`s reports with other users. We aim to speed up this clustering by using latent variable matrix factorization and then clustering on much smaller latent variables.\item Bootstrapping the clustering process by using non-task data to form an initial clustering before agent reporting begins.
+\begin{enumerate}
+\item Clustering is usually done by comparing each user`s reports with other users. We aim to speed up this clustering by using latent variable matrix factorization and then clustering on much smaller latent variables.
+\item Bootstrapping the clustering process by using non-task data to form an initial clustering before agent reporting begins.
 \end{enumerate}
 
 \section{Background}
@@ -59,9 +64,13 @@ Additionally, because this method explicitly requires an existing signal distrib
 %\item What are the challenges/opportunities inherent to the data? (High dimensional, sparse, missing data, noise, structure, discrete/continuous, etc?)
 %\end{itemize}
 
-In \citet{shnayder2016informed}, Shnayder et al. prove that the Correlated Agreement multi-task peer prediction mechanism maximally incentivizes truthful reporting without a ground truth for homogeneous users. The CA mechanism can be generalized to non-homogeneous users but requires a prohibitive number of user reports; thus, \citet{agarwal2017} bounds expected regret by clustering users with similar signal-report distributions.  This regret bound is proportional to the L1 difference between user-user '$\Delta$ Matrices' and those of their respective clusters, where a $\Delta$ Matrix of users $q,r$ is defined as: $$D_{q,r}(i,j) = p(\textrm{q reports i, r reports j}) - p(\textrm{q reports i})p(\textrm{r reports j})$$
+In \citet{shnayder2016informed}, Shnayder et al. prove that the Correlated Agreement multi-task peer prediction mechanism maximally incentivizes truthful reporting without a ground truth for homogeneous users. The CA mechanism can be generalized to non-homogeneous users but requires a prohibitive number of user reports; thus, \citet{agarwal2017} bounds expected regret by clustering users with similar signal-report distributions.  This regret bound is proportional to the L1 difference between user-user '$\Delta$ Matrices' and those of their respective clusters, where a $\Delta$ Matrix of users $q,r$ is defined as: 
+\begin{align*}
+D_{q,r}(i,j) &= p(\textrm{q reports i, r reports j}) \\
+&- p(\textrm{q reports i})p(\textrm{r reports j})
+\end{align*}
 The primary dataset we use is that of the \emph{Good Judgment Global Forecasting Competition}, available at \texttt{https://dataverse.harvard.edu/dataverse.}
-\texttt{xhtml?alias=gjp}. There are many challenges inherent to this dataset. First, the idea of a task is not well-defined. Users enter predictions in continuous time, and the true probability of an event will change over time, such that each minute could be considered a different task (Note that if we expect users only update their predictions in response to new information, these time-question tasks will be independent conditional on the signal). We choose to bucket these responses by week to mediate between the desire to allow for variation in true probability over time while maintaining sufficient task response density. This results in 1,499,294 predictions by 2,052 users on 1,548 tasks. Secondly, the signal itself can be expected to have a high degree of noise, as the probability of any of these global events is not well-defined even in the absence of individual interpretation effects. 
+\texttt{xhtml?alias=gjp}. There are many challenges inherent to this dataset. First, the idea of a task is not well-defined. Users enter predictions in continuous time, and the true probability of an event will change over time, such that each minute could be considered a different task (Note that if we expect users to only update their predictions in response to new information, these time-question tasks will be independent conditional on the signal). We choose to bucket these responses by week to mediate between the desire to allow for variation in true probability over time while maintaining sufficient task response density. This results in 1,499,294 predictions by 2,052 users on 1,548 tasks. Secondly, the signal itself can be expected to have a high degree of noise, as the probability of any of these global events is not well-defined even in the absence of individual interpretation effects. 
 
 To study the effects of the clustering methodologies in a slightly less noisy realm, we additionally use a second dataset of user judgments on whether or not websites contained adult content. This dataset, termed \emph{Adult}, was pulled from the Square Project at the University of Texas. The data is available at \texttt{https://github.com/ipeirotis/}
 \texttt{Get-Another-Label/tree/master/data}. We limit the dataset to users who gave at least one report of each signal, resulting in 65,144 reports by 389 users on 10,381 tasks.
@@ -103,7 +112,9 @@ The use of the Correlated Agreement mechanism \citep{shnayder2016informed} requi
 %\item What are the parameters or latent variables of this model that you plan on estimating or inferring? Be explicit. How many are there? Which are you assuming are given? How do these relate to the original problem description?
 %\end{itemize}
 
-Given a sparse matrix containing tasks, users, and users` reports on each task, the goal is to produce clusters which accurately describe users` reporting behavior. Because of the sparse matrix data, we focus on matrix factorization models to generate latent factor representations of users. That is, we assume that there is some latent variable representation of a user`s forecasting behavior, $u_i$ that interacts with related task-specific factors, $t_j$. These could be thought of, for example as the task`s topic areas and the user`s expertise in those specific topic areas. After transforming the predictions to range from -1 to 1 instead of 0 to 1, we use the following model, shown in Figure~\ref{fig:diagram}:  
+Given a sparse matrix containing tasks, users, and users` reports on each task, the goal is to produce clusters which accurately describe users` reporting behavior. Because of the sparse matrix data, we focus on matrix factorization models to generate latent factor representations of users. That is, we assume that there is some latent variable representation of a user`s forecasting behavior, $u_i$ that interacts with related task-specific factors, $t_j$. These could be thought of, for example as the task`s topic areas and the user`s expertise or bias in those specific topic areas. 
+
+\subsection{Good Judgement Matrix Factorization Model} After transforming the predictions to range from -1 to 1 instead of 0 to 1, we use the following model, shown in Figure~\ref{fig:diagram}:  
   $$
   p_{i,j} \sim \mathcal{N}(\textrm{tanh}\left( \mu_{i_M}\left[u_i^{T}t_j + g + \mu_j\right] + \mu_{i_A}\right), \sigma^2)
  $$
@@ -115,13 +126,21 @@ Given a sparse matrix containing tasks, users, and users` reports on each task, 
   
       For \emph{Adult}, which does not have this probablistic representation and has reports ranging from 1 to 4, we use only additive biases and remove the tanh.
       
- TODO PREDICTING LATENT USER VECTORS FROM PSYCH DATA 
+\subsection{Using Non-Task Data to Extend the Model for Cold Start Users}
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \includegraphics[height=8cm]{dgmaccurate.png}
   \caption{\label{fig:diagram} Model of prediction generation.}
 \end{figure}
+ 
+           
+The good judgement matrix factorization model depends on an accurate estimation of various individual user parameters, requiring several predictions from a user before accurate predictions can be made. To mitigate these concerns, we use non-task psychological data to try to predict a users latent variables. We do this in one of two ways:
+
+\noindent\textbf{1. Predict latent variables from psychological data: } In our first model, we try predicting a user's latent variable representation directly from their psychological data. We use both a more interpretable simple linear regression model and a less interpretable fully connected neural network to perform the predictions. Then, it would be possible to make a prediction of a user's task report using a weighted combination of the predicted latent variables and the trained latent variables from matrix factorization. 
+
+\noindent\textbf{2. Create user latent variable representation by summing feature latent variables} In this model, adapted from \citep{kula2015metadata}, a user's latent variable representation is created through a summation of various feature latent variables. If $f$ is a set of features, then each feature has a latent vector $\mathbf{L_{f}}$. Then for user $u$ with feature values $u_{f}$, the user's latent variable representation is $$\sum_{i=1}^{\vert f \vert} u_{f} \mathbf{L_{f}} + \mathbf{L_{u}}$$ where $\mathbf{L_{u}}$ is a user-specific latent vector which starts at $\mathbf{0}$. Thus, a user's predictions start by using latent vector $\sum_{i=1}^{\vert f \vert} u_{f} \mathbf{L_{f}}$ and start taking into account a user-specific latent vector $\mathbf{L_{u}}$ as data comes in and moves this value off $\mathbf{0}$.
+
 
 
 \section{Inference (or Training)}
