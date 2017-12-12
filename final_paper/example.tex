@@ -332,13 +332,9 @@ However, clustering on the latent factors for all values of K was significantly 
 
 \subsection{Cold Start Problem: Predicting Latent Variables Directly} Table \ref{tbl:cold_start_technique_1} shows the performance using a Neural Network and simple linear regression in predicting the latent variables for new users from just psychological data. The mean distance is calculated as the $\ell_{2}$ distance from their final trained values after observing predictions and updating their latent vectors. Both are compared to just using a latent vector made up of coordinate-wise mean values for each new user. That is, the mean vector takes each of the $k$ dimensions for a latent vector and estimates a new user's value in that dimenion by the average of every other user's value for that dimension. 
 
-For both linear regression and the neural network, there is some improvement over just using the mean latent vector, and so we see some improvement over a random guess for new users. Ideally, this effect would be much larger; the extent to which this is possible using the psychological data for Good Judgment is unknown. Indeed, considering that there was no prior method of predicting new user's reports for Good Judgment, this provides some utitlity.
-
 \input{brian_results.tex}
 
 \section{Discussion}
-
-
 
 %\begin{itemize}
 %\item What conclusions can you draw from the results section?
@@ -350,6 +346,10 @@ For both linear regression and the neural network, there is some improvement ove
 The results show us that it is possible to use a significantly compressed representation of user heterogeneity and still arrive at a clustering that is still almost as successful at encouraging truthful reporting as the significantly more time- and memory-intensive task of clustering directly on the user-user signal distributions. Notably, the user representation we use does not explicitly encode the interactions between any two users` reporting behaviors yet performs nearly as well as the clustering will full knowledge of this data.
 
 We note that the RMSE and L1 loss of the training model are lowest for larger numbers of latent factors, yet the clustering performs best when only two latent factors are used. One possible explanation is that this setup forces more of the user variability into the multiplicative and additive biases, which are more specifically relevant to the task of predicting a distribution of reports given signals. Supporting this interpretation, clustering the \emph{Adult} dataset, which does not have the task structure to allow for modeling known psychological biases (specifically with respect to probability reporting) as its latent user biases, does not degrade as we increase the number of latent factors (See Figure~\ref{fig:adult}).
+
+In terms of predicting user reports from non-task data, the results show a small but consistent improvement over just using the mean latent vector. Ideally, this effect would be much larger; the extent to which this is possible using the psychological data for Good Judgment is unknown. Indeed, considering that there was no prior method of predicting new user's reports for Good Judgment, this provides some utitlity.
+
+Since both methods show similar performance improvements, both are promising directions for future work. Predicting latent variables from non-task data directly would give more flexibility in terms of which models can easily be applied. For instance, a user's final latent vector does not need to depend linearly on a combination of its features latent vectors as it does in the Hybrid CF/CB approach. However, the Hybrid CF/CB approach is easier to integrate into a full system. The Hybrid CF/CB approach provides a clear way to make online updates to a user's latent vector representation. In comparison, it's unclear in the direct prediction approach how to best transform from the initial prediction of a user's latent vector to its trained representation. 
 
 \begin{figure}
   \centering
