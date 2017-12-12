@@ -28,14 +28,9 @@
 ]
 
 \begin{abstract}
-  \begin{itemize}
-  \item This document describes the expected style, structure, and rough proportions for your final project write-up.
-  \item While you are free to break from this structure, consider it a strong prior for our expectations of the final report.
-\item Length is a hard constraint. You are only allowed max \textbf{8 pages} in this format. While you can include supplementary material, it will not be factored into the grading process. It is your responsibility to convey the main contributions of the work in the length given.
-  \end{itemize}
+In the setting of heterogeneous peer prediction, soliciting truthful reporting from agent's is done via learning an agent's reporting type. This learned reporting type is used to produce payout schemes such that telling the truth is a low-regret strategy. Mostly, this work is done via clustering on user-user $\Delta$ Matrices, which capture dependence in the probability of user's reports. This clustering is done directly using matrix norms on the $\Delta$ Matrices. 
 
-
-\lipsum[1]
+In this paper, we present advantages to using latent variable matrix factorization in heterogeneous peer prediction. We show that clustering users by their corresponding latent variables is enough to produce nearly as good a clustering as using the $\Delta$ Matrices directly. Additionally, we show that it is orders of magnitude faster to produce these clusterings when using a latent variable representation. Finally, we show how latent variables and non-task data can be used in conjunction to produce solutions for the cold start problem, where a user has no report data and thus has an unknown initial reporting strategy.
 \end{abstract}
 
 \section{Introduction}
@@ -314,10 +309,10 @@ For the hybrid CF/CB technique of using user feature dependent latent vectors, w
 \end{tabular}
 \end{table}
 
-\begin{table}[t]\label{tbl:cold_start_technique_1}
+\begin{table}[t]
 \centering
 \caption{Cold Start Predictions}
-\label{fig:time}
+\label{tbl:cold_start_technique_1}
 \begin{tabular}{lllll}
                          \multicolumn{1}{l|}{Method}& Mean Distance \\ \hline
 \multicolumn{1}{l|}{Baseline (Mean Latent Vector)} & 0.67 \\
@@ -331,9 +326,11 @@ While we achieved the lowest training and validation loss using 10 latent user f
 
 However, clustering on the latent factors for all values of K was significantly faster than clustering directly on the $\Delta$ matrices, as the flattened concatenated matrices result in 51,300 features for each user. See Table~\ref{fig:time} for details.
 
-\subsection{Cold Start Problem} Table \ref{tbl:cold_start_technique_1} shows the performance using a Neural Network and simple linear regression in predicting the latent variables for new users from just psychological data. The mean distance is calculated as the $\ell_{2}$ distance from their final trained values after observing predictions and updating their latent vectors. Both are compared to just using a latent vector made up of coordinate-wise mean values for each new user. For each technique, there is some improvement over just using the mean latent vector, and we see some improvement over a random guess for new users. Ideally, this effect would be much larger; the extent to which this is possible using the psychological data for Good Judgment is unknown. Indeed, considering that there was no prior method of predicting new user's reports for Good Judgment, this provides some utitlity. 
+\subsection{Cold Start Problem: Predicting Latent Variables Directly} Table \ref{tbl:cold_start_technique_1} shows the performance using a Neural Network and simple linear regression in predicting the latent variables for new users from just psychological data. The mean distance is calculated as the $\ell_{2}$ distance from their final trained values after observing predictions and updating their latent vectors. Both are compared to just using a latent vector made up of coordinate-wise mean values for each new user. That is, the mean vector takes each of the $k$ dimensions for a latent vector and estimates a new user's value in that dimenion by the average of every other user's value for that dimension. 
 
-%\input{brian_results.tex}
+For both linear regression and the neural network, there is some improvement over just using the mean latent vector, and so we see some improvement over a random guess for new users. Ideally, this effect would be much larger; the extent to which this is possible using the psychological data for Good Judgment is unknown. Indeed, considering that there was no prior method of predicting new user's reports for Good Judgment, this provides some utitlity.
+
+\input{brian_results.tex}
 
 \section{Discussion}
 
