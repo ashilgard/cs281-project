@@ -1,0 +1,13 @@
+\begin{table}[t]
+\centering
+\caption{Cold Start Predictions}
+\label{tbl:LightFM}
+\begin{tabular}{lllll}
+                         \multicolumn{1}{l|}{Method}& Mean Distance \\ \hline
+\multicolumn{1}{l|}{Baseline (Mean Latent Vector)} & 0.61 \\
+\multicolumn{1}{l|}{From Sum of User Feature Vectors} & 0.53 \\
+
+\end{tabular}
+\end{table}
+
+Table \ref{tbl:LightFM} shows the results for a similar experiment using the feature-based expansion of matrix factorization. In this second set of results, we look at a user's initial latent vector from its features and calculate the $\ell_{2}$ distance from its final latent variable $u_{i}$ after training. Similarly to before, we compare this to using the mean latent vector for a user. We note that this is not in the same table as Table \ref{tbl:cold_start_technique_1} because the corresponding set of task latent vectors is different. Similarly to before, we are given a small headstart on predicting a user's final latent vector from just these psychological values. In addition, this technique is easier to integrate into a full system as its easy to see how to make online updates to a user's latent vector representation. In the previous technique, it's unclear how to best transform from the initial prediction of a user's latent vector to its trained representation. In this technique, this happens naturally as a result of training. 
