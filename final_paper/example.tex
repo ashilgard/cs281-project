@@ -28,7 +28,7 @@
 ]
 
 \begin{abstract}
-In the setting of heterogeneous peer prediction, soliciting truthful reporting from agent's is done via learning an agent's reporting type. This learned reporting type is used to produce payout schemes such that telling the truth is a low-regret strategy. Mostly, this work is done via clustering on user-user $\Delta$ Matrices, which capture dependence in the probability of user's reports. This clustering is done directly using matrix norms on the $\Delta$ Matrices. 
+In the setting of heterogeneous peer prediction, soliciting truthful reporting from agents is done via learning an agent's reporting type. This learned reporting type is used to produce payout schemes such that telling the truth is a low-regret strategy. Mostly, this work is done via clustering on user-user $\Delta$ Matrices, which capture dependence in the probability of users' reports. This clustering is done directly using matrix norms on the $\Delta$ Matrices. 
 
 In this paper, we present advantages to using latent variable matrix factorization in heterogeneous peer prediction. We show that clustering users by their corresponding latent variables is enough to produce nearly as good a clustering as using the $\Delta$ Matrices directly. Additionally, we show that it is orders of magnitude faster to produce these clusterings when using a latent variable representation. Finally, we show how latent variables and non-task data can be used in conjunction to produce solutions for the cold start problem, where a user has no report data and thus has an unknown initial reporting strategy.
 \end{abstract}
@@ -325,7 +325,7 @@ For the hybrid CF/CB technique of using user feature dependent latent vectors, w
 
 \end{tabular}
 \end{table}
-\subsection{Sophie}
+\subsection{Training User Vectors for Clustering}
 While we achieved the lowest training and validation loss using 10 latent user factors (See Figure~\ref{fig:train}), the best L1 loss against the original $\Delta$ matrices was achieved by clustering on only 2 latent user factors (See Figure~\ref{fig:clust_dist}).  Distribution results are given in Table~\ref{fig:dist}.
 
 However, clustering on the latent factors for all values of K was significantly faster than clustering directly on the $\Delta$ matrices, as the flattened concatenated matrices result in 51,300 features for each user. See Table~\ref{fig:time} for details.
@@ -349,9 +349,7 @@ For both linear regression and the neural network, there is some improvement ove
 
 The results show us that it is possible to use a significantly compressed representation of user heterogeneity and still arrive at a clustering that is still almost as successful at encouraging truthful reporting as the significantly more time- and memory-intensive task of clustering directly on the user-user signal distributions. Notably, the user representation we use does not explicitly encode the interactions between any two users` reporting behaviors yet performs nearly as well as the clustering will full knowledge of this data.
 
-We note that the RMSE and L1 loss of the training model are lowest for larger numbers of latent factors, yet the clustering performs best when only two latent factors are used. One possible explanation is that this setup forces more of the user variability into the multiplicative and additive biases, which are more specifically relevant to the task of predicting a distribution of reports given signals. Supporting this interpretation, clustering the \emph{Adult} dataset, which does not have the task structure to allow for modeling known psychological biases (specifically with respect to probability reporting) as its latent user biases, does not degrade as we increase the number of latent factors.
-
-TODO INCLUDE CHART
+We note that the RMSE and L1 loss of the training model are lowest for larger numbers of latent factors, yet the clustering performs best when only two latent factors are used. One possible explanation is that this setup forces more of the user variability into the multiplicative and additive biases, which are more specifically relevant to the task of predicting a distribution of reports given signals. Supporting this interpretation, clustering the \emph{Adult} dataset, which does not have the task structure to allow for modeling known psychological biases (specifically with respect to probability reporting) as its latent user biases, does not degrade as we increase the number of latent factors (See Figure~\ref{fig:adult}).
 
 \begin{figure}
   \centering
@@ -359,8 +357,12 @@ TODO INCLUDE CHART
   \caption{\label{fig:train} Training Results, L1 Loss.}
   \includegraphics[width= \columnwidth]{clust_dist.png}
   \caption{\label{fig:clust_dist} Average L1 Distance.}
-  \missingfigure{}
-  \caption{Visualizations of the internals of the system.}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width= \columnwidth]{adult}
+  \caption{\label{fig:adult} Average L1 Distance, Adult Dataset.}
 \end{figure}
 
 \section{Conclusion}
