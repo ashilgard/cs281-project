@@ -367,12 +367,11 @@ Since both methods show similar performance improvements, both are promising dir
 
 \section{Conclusion}
 
-\begin{itemize}
-\item What happened?
-\item What next?
-\end{itemize}
+This paper showed the effectiveness of factored latent variable models in the realm of peer prediction. Notably, we showed the ability to produce order of magnitude speedups in clustering while providing similar performance to clustering directly on the metric of interest. Additionally, we showed how latent variable models can be easily integrated into cold start strategies to try to mitigate clustering degradation in the face of new users. 
 
-\lipsum[4-6]
+One line of future work is to see how the results presented here generalize to more datasets. We currently have promising results for clustering on multiple datasets in peer prediction, but we only have a single dataset for predicting latent vectors from non-task data. More datasets could allow us to tell to what extent non-task data mitigates the problems presented by incorporating new users into a clustering. 
+
+Finally, we would like to investigate why lower dimensional latent vector representations generalized better to $\Delta$ Matrices considering that we more accurately predicted user reports using higher dimensional latent vector representations. (One more sentence here...)
 
 % \section*{Acknowledgements}
 
