@@ -371,7 +371,11 @@ This paper showed the effectiveness of factored latent variable models in the re
 
 One line of future work is to see how the results presented here generalize to more datasets. We currently have promising results for clustering on multiple datasets in peer prediction, but we only have a single dataset for predicting latent vectors from non-task data. More datasets could allow us to tell to what extent non-task data mitigates the problems presented by incorporating new users into a clustering. 
 
-Finally, we would like to investigate why lower dimensional latent vector representations generalized better to $\Delta$ Matrices considering that we more accurately predicted user reports using higher dimensional latent vector representations. (One more sentence here...)
+Furthermore, it might allow us to investigate what type of non-task data is most relevant to the task of accurately predicting how a user will report. Good Judgment participants were generally highly self-motivated and returned to the competition because they enjoyed playing. More typically peer prediction is used to attempt to motivate crowdsourced workers, who may be incentivized to provide as little effort as possible. If a carefully chosen psychological quiz could predict which crowdsourced workers were likely to be the types of users who do not provide meaningful variation in their reports based on signals, they could be excluded before experimental resources are wasted.
+
+Additionally, the datasets we chose to focus on, \emph{Good Judgment} and to a lesser extent \emph{Adult} each have very noisy underlying signals. It would be interesting to see how the model would perform and what would be the correct number of latent variables in a more straightforward model of heterogeneous user preferences, such as learning clusterings to evaluate effort in Google Business Reviews.
+
+Heterogeneous peer prediction is much more broadly applicable than models that assume homogeneous users, and the experiments in this project help to show how machine learning techniques can mitigate some of the problems surrounding its more general adoption.
 
 % \section*{Acknowledgements}
 
